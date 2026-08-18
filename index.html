@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEMIN AI Studio</title>
+<meta name="description" content="TEMIN AI Studio — Create Faster. Teach Smarter.">
+<style>
+:root{
+  --purple:#7c3aed;--blue:#2563eb;--ink:#172033;--muted:#687086;
+  --line:#e9eaf0;--bg:#f7f7fb;--white:#fff;
+  --shadow:0 12px 32px rgba(27,31,59,.08)
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg);color:var(--ink)
+}
+button,input,select,textarea{font:inherit}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.sidebar{
+  background:#fff;border-right:1px solid var(--line);padding:22px 14px;
+  position:sticky;top:0;height:100vh
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:18px;padding:4px 10px 24px}
+.brandmark{
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:linear-gradient(135deg,#7c3aed,#2563eb);color:white
+}
+.navbtn{
+  width:100%;border:0;background:transparent;text-align:left;padding:11px 12px;
+  border-radius:10px;color:#424a5f;cursor:pointer;margin:2px 0
+}
+.navbtn:hover,.navbtn.active{background:#f0ebff;color:#6530d8;font-weight:700}
+.sidefoot{position:absolute;bottom:20px;left:24px;color:#9297a6;font-size:12px}
+.main{padding:24px 34px 50px;max-width:1500px;width:100%;margin:auto}
+.topbar{display:flex;align-items:center;gap:16px}
+.search{
+  flex:1;max-width:620px;background:white;border:1px solid var(--line);
+  border-radius:12px;padding:12px 15px
+}
+.pill{margin-left:auto;background:white;border:1px solid var(--line);padding:10px 14px;border-radius:999px;font-weight:700}
+.hero{
+  margin-top:26px;padding:34px;border-radius:22px;
+  background:linear-gradient(115deg,#e9ddff 0%,#dceaff 48%,#dff8f0 100%);
+  display:flex;justify-content:space-between;gap:24px;align-items:center;overflow:hidden
+}
+.hero h1{font-size:clamp(30px,5vw,58px);line-height:.98;margin:8px 0 14px;letter-spacing:-2px}
+.hero p{color:#535b70;max-width:590px;font-size:17px}
+.cta{border:0;background:#6d3be8;color:white;padding:13px 18px;border-radius:11px;font-weight:800;cursor:pointer}
+.ghost{border:1px solid #d9dbe5;background:white;padding:12px 16px;border-radius:11px;font-weight:700;cursor:pointer}
+.spark{font-size:82px;filter:drop-shadow(0 14px 20px rgba(74,50,160,.16));transform:rotate(-8deg)}
+.section{margin-top:32px}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.sectionhead h2{font-size:21px;margin:0}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.card{
+  background:white;border:1px solid var(--line);border-radius:16px;padding:18px;
+  box-shadow:0 4px 14px rgba(30,35,70,.03);cursor:pointer;transition:.18s
+}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:23px;background:#f1ecff}
+.card h3{margin:14px 0 5px;font-size:16px}
+.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+.badge{display:inline-block;margin-top:11px;padding:4px 8px;border-radius:999px;background:#fff0e7;color:#c05a20;font-size:11px;font-weight:800}
+.hidden{display:none!important}
+.generator{margin-top:24px}
+.genbar{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.back{border:0;background:white;border-radius:10px;padding:10px 12px;cursor:pointer}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,.82fr);gap:20px}
+.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:22px}
+.panel h2{margin-top:0}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field.full{grid-column:1/-1}
+.field label{display:block;font-size:12px;font-weight:800;margin-bottom:6px;color:#555d70}
+.field input,.field select,.field textarea{
+  width:100%;border:1px solid #dfe1e8;border-radius:10px;padding:11px;background:#fff;outline:none
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#8c67ef;box-shadow:0 0 0 3px #eee8ff}
+.modes{display:flex;background:#f2f3f7;padding:4px;border-radius:11px;margin-bottom:18px}
+.mode{flex:1;border:0;background:transparent;border-radius:8px;padding:9px;cursor:pointer;font-weight:700}
+.mode.active{background:white;box-shadow:0 2px 8px rgba(20,25,50,.08)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.suggest{border:1px solid #d7cdf9;background:#f7f3ff;color:#6530d8;padding:11px 14px;border-radius:10px;font-weight:800;cursor:pointer}
+.output{
+  min-height:430px;background:#171923;color:#e8e9ef;border-radius:14px;padding:18px;
+  white-space:pre-wrap;font:13px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace
+}
+.output.empty{color:#858b9d;display:grid;place-items:center;text-align:center}
+.outactions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.toast{
+  position:fixed;right:24px;bottom:24px;background:#172033;color:white;padding:12px 16px;
+  border-radius:10px;box-shadow:var(--shadow);opacity:0;transform:translateY(12px);
+  transition:.2s;pointer-events:none
+}
+.toast.show{opacity:1;transform:none}
+@media(max-width:1000px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .workspace{grid-template-columns:1fr}
+  .sidebar{display:none}.app{display:block}.main{padding:18px}
+  .hero{padding:26px}.spark{display:none}
+}
+@media(max-width:600px){
+  .grid{grid-template-columns:1fr 1fr;gap:10px}
+  .card{padding:14px}.fields{grid-template-columns:1fr}.field.full{grid-column:auto}
+  .hero h1{font-size:38px}.hero{margin-top:18px}.topbar .pill{display:none}
+  .main{padding:14px}.panel{padding:16px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><span class="brandmark">✦</span>TEMIN AI</div>
+  <button class="navbtn active" onclick="showHome()">⌂ &nbsp; Home</button>
+  <button class="navbtn" onclick="openPoster()">🎨 &nbsp; Design Studio</button>
+  <button class="navbtn">✍️ &nbsp; Writing Studio</button>
+  <button class="navbtn">📊 &nbsp; Report Studio</button>
+  <button class="navbtn">👨🏻‍🏫 &nbsp; Teaching Studio</button>
+  <button class="navbtn">🎬 &nbsp; Media Studio</button>
+  <button class="navbtn">🧠 &nbsp; Prompt Studio</button>
+  <div class="sidefoot">Build 001 • SK Temin</div>
+</aside>
+
+<main class="main">
+<section id="home">
+  <div class="topbar">
+    <input class="search" placeholder="Cari apa yang cikgu nak hasilkan...">
+    <span class="pill">SK TEMIN</span>
+  </div>
+
+  <div class="hero">
+    <div>
+      <small>✦ TEMIN AI STUDIO</small>
+      <h1>Create Faster.<br>Teach Smarter.</h1>
+      <p>Tak perlu pandai menulis prompt. Pilih apa yang cikgu perlukan, isi maklumat ringkas dan TEMIN AI Studio uruskan prompt untuk cikgu.</p>
+      <button class="cta" onclick="openPoster()">✨ Cuba AI Poster</button>
+    </div>
+    <div class="spark">🎨</div>
+  </div>
+
+  <div class="section">
+    <div class="sectionhead"><h2>🔥 Popular untuk guru</h2></div>
+    <div class="grid">
+      <div class="card" onclick="openPoster()">
+        <div class="icon">🖼️</div>
+        <h3>AI Poster Generator</h3>
+        <p>Hebahan WhatsApp, program, pertandingan dan aktiviti sekolah.</p>
+        <span class="badge">🔥 Popular</span>
+      </div>
+      <div class="card">
+        <div class="icon">📝</div>
+        <h3>AI Surat Rasmi</h3>
+        <p>Surat makluman, jemputan, permohonan dan penghargaan.</p>
+        <span class="badge">Build 002</span>
+      </div>
+      <div class="card">
+        <div class="icon">📄</div>
+        <h3>One Page Report</h3>
+        <p>Laporan satu muka surat dengan gambar dan rumusan.</p>
+        <span class="badge">Akan datang</span>
+      </div>
+      <div class="card">
+        <div class="icon">📚</div>
+        <h3>AI RPH Helper</h3>
+        <p>Bantu sediakan RPH dengan input minimum.</p>
+        <span class="badge">Akan datang</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sectionhead"><h2>Studio</h2></div>
+    <div class="grid">
+      <div class="card" onclick="openPoster()"><div class="icon">🎨</div><h3>Design Studio</h3><p>Poster, banner, infografik dan sijil.</p></div>
+      <div class="card"><div class="icon">✍️</div><h3>Writing Studio</h3><p>Surat, kertas kerja, minit, ucapan dan laporan.</p></div>
+      <div class="card"><div class="icon">👨🏻‍🏫</div><h3>Teaching Studio</h3><p>RPH, kuiz, lembaran kerja dan BBM.</p></div>
+      <div class="card"><div class="icon">🧠</div><h3>Prompt Studio</h3><p>Smart Prompt Library, preset dan Brand Kit.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="poster" class="generator hidden">
+  <div class="genbar">
+    <button class="back" onclick="showHome()">← Home</button>
+    <div><strong>AI Poster Generator</strong><div style="font-size:12px;color:#777">Pilih • Jana • Salin</div></div>
+  </div>
+
+  <div class="workspace">
+    <div class="panel">
+      <div class="modes">
+        <button id="easyBtn" class="mode active" onclick="setMode('easy')">Mode Mudah</button>
+        <button id="proBtn" class="mode" onclick="setMode('pro')">Mode Custom</button>
+      </div>
+
+      <h2>Maklumat Poster</h2>
+      <div class="fields">
+        <div class="field full">
+          <label>TAJUK / PROGRAM</label>
+          <input id="title" placeholder="Contoh: Majlis Peluncuran Hari Skaf Pengakap 2026">
+        </div>
+
+        <div class="field">
+          <label>TARIKH</label>
+          <input id="date" placeholder="5 Ogos 2026">
+        </div>
+
+        <div class="field">
+          <label>MASA</label>
+          <input id="time" placeholder="7.40 pagi – 8.10 pagi">
+        </div>
+
+        <div class="field">
+          <label>TEMPAT</label>
+          <input id="venue" placeholder="Arena Hebat">
+        </div>
+
+        <div class="field">
+          <label>SASARAN / PESERTA</label>
+          <input id="audience" placeholder="Ahli Pengakap SK Temin">
+        </div>
+
+        <div class="field">
+          <label>JENIS POSTER</label>
+          <select id="type">
+            <option>Hebahan WhatsApp</option>
+            <option>Program Sekolah</option>
+            <option>Pertandingan</option>
+            <option>Rasmi</option>
+            <option>Fun / Ceria</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>GAYA</label>
+          <select id="style">
+            <option>Ceria & moden</option>
+            <option>Pastel lembut</option>
+            <option>Rasmi & premium</option>
+            <option>Kartun</option>
+            <option>3D</option>
+            <option>Watercolor</option>
+            <option>Flat design</option>
+            <option>Realistik</option>
+          </select>
+        </div>
+
+        <div class="field pro hidden">
+          <label>WATAK</label>
+          <select id="character">
+            <option>Boy & Girl</option>
+            <option>Boy</option>
+            <option>Girl bertudung</option>
+            <option>Guru</option>
+            <option>Ibu bapa</option>
+            <option>Tanpa watak</option>
+          </select>
+        </div>
+
+        <div class="field pro hidden">
+          <label>PAKAIAN</label>
+          <select id="uniform">
+            <option>Uniform sekolah Malaysia</option>
+            <option>Pengakap</option>
+            <option>Pandu Puteri Tunas</option>
+            <option>PPIM</option>
+            <option>BSMM</option>
+            <option>TKRS</option>
+            <option>Pengawas sekolah (ungu)</option>
+            <option>PSS (kuning cair)</option>
+            <option>SPBT (hijau)</option>
+            <option>PRS (biru cair)</option>
+            <option>Pakaian PJ</option>
+            <option>Baju koko SK Temin</option>
+          </select>
+        </div>
+
+        <div class="field pro hidden">
+          <label>LATAR / VENUE VISUAL</label>
+          <select id="background">
+            <option>Sekolah</option>
+            <option>Kelas</option>
+            <option>Dewan</option>
+            <option>Padang</option>
+            <option>Hutan</option>
+            <option>Makmal</option>
+            <option>Pejabat</option>
+          </select>
+        </div>
+
+        <div class="field pro hidden">
+          <label>WAKTU</label>
+          <select id="daytime">
+            <option>Pagi</option>
+            <option>Tengah hari</option>
+            <option>Senja</option>
+            <option>Malam</option>
+          </select>
+        </div>
+
+        <div class="field pro hidden">
+          <label>DIMENSI</label>
+          <select id="ratio">
+            <option>WhatsApp / 4:5</option>
+            <option>A4 Portrait</option>
+            <option>A4 Landscape</option>
+            <option>Square 1:1</option>
+            <option>Story 9:16</option>
+            <option>Landscape 16:9</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label>MAKLUMAT TAMBAHAN</label>
+          <textarea id="extra" rows="3" placeholder="Contoh: Pakaian: Uniform Pengakap. Penganjur: Unit Kokurikulum SK Temin."></textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="suggest" onclick="suggest()">🎲 Cadangkan untuk saya</button>
+        <button class="cta" onclick="generatePrompt()">✨ JANA PROMPT</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Prompt Siap</h2>
+      <div id="output" class="output empty">✨<br><br>Prompt akan muncul di sini.<br>Guru tak perlu fikir cara menulis prompt.</div>
+      <div class="outactions">
+        <button class="ghost" onclick="copyPrompt()">📋 Salin Prompt</button>
+        <button class="cta" onclick="openChatGPT()">↗ Buka ChatGPT</button>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+</div>
+
+<div id="toast" class="toast">Disalin!</div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+function openPoster(){
+  $('home').classList.add('hidden');
+  $('poster').classList.remove('hidden');
+  scrollTo(0,0);
+}
+
+function showHome(){
+  $('poster').classList.add('hidden');
+  $('home').classList.remove('hidden');
+  scrollTo(0,0);
+}
+
+function setMode(m){
+  document.querySelectorAll('.pro').forEach(x=>x.classList.toggle('hidden',m==='easy'));
+  $('easyBtn').classList.toggle('active',m==='easy');
+  $('proBtn').classList.toggle('active',m==='pro');
+}
+
+function suggest(){
+  const t=$('title').value.toLowerCase();
+
+  if(t.includes('pengakap')){
+    $('style').value='Ceria & moden';
+    $('type').value='Program Sekolah';
+    $('extra').value=$('extra').value||'Gunakan elemen visual Pengakap yang kemas, mesra murid dan sesuai untuk hebahan sekolah.';
+    setMode('pro');
+    $('uniform').value='Pengakap';
+    $('background').value='Sekolah';
+  }else if(t.includes('merdeka')||t.includes('kebangsaan')){
+    $('style').value='Ceria & moden';
+    $('extra').value=$('extra').value||'Tema patriotik Malaysia dengan merah, putih, biru dan kuning; suasana ceria dan membanggakan.';
+  }else{
+    $('style').value='Pastel lembut';
+    $('type').value='Hebahan WhatsApp';
+    $('extra').value=$('extra').value||'Susun atur bersih, mesra guru dan mudah dibaca di telefon.';
+  }
+
+  toast('Cadangan telah dipilih 🎲');
+}
+
+function generatePrompt(){
+  const val=id=>$(id)?.value||'';
+  const pro=$('proBtn').classList.contains('active');
+
+  let p=`Cipta sebuah poster ${val('type')} yang menarik, profesional dan mudah dibaca untuk kegunaan sekolah rendah Malaysia.
+
+MAKLUMAT WAJIB:
+Tajuk: ${val('title')||'[Tajuk program]'}
+Tarikh: ${val('date')||'[Tarikh]'}
+Masa: ${val('time')||'[Masa]'}
+Tempat: ${val('venue')||'[Tempat]'}
+Peserta/Sasaran: ${val('audience')||'[Sasaran]'}
+${val('extra')?'Maklumat tambahan: '+val('extra')+'\n':''}
+
+REKA BENTUK:
+Gaya: ${val('style')}.
+`;
+
+  if(pro){
+    p+=`Watak: ${val('character')}.
+Pakaian: ${val('uniform')}.
+Latar visual: ${val('background')}.
+Waktu: ${val('daytime')}.
+Format/dimensi: ${val('ratio')}.
+`;
+  }
+
+  p+=`
+Pastikan tipografi jelas, hierarki maklumat kuat, ruang tidak terlalu padat, ejaan Bahasa Melayu tepat dan hasil akhir kelihatan seperti poster sekolah yang direka secara profesional. Jangan tambah maklumat program yang tidak diberikan. Jika menggunakan murid, paparkan murid sekolah rendah Malaysia dengan pakaian yang sopan dan sesuai.
+
+Identiti: SK Temin, Jerantut, Pahang. Gunakan identiti sekolah secara kemas dan tidak berlebihan.`;
+
+  $('output').textContent=p;
+  $('output').classList.remove('empty');
+}
+
+async function copyPrompt(){
+  const t=$('output').textContent;
+  if($('output').classList.contains('empty')) return toast('Jana prompt dahulu');
+
+  try{
+    await navigator.clipboard.writeText(t);
+    toast('Prompt disalin ✓');
+  }catch(e){
+    toast('Tak dapat salin — pilih teks secara manual');
+  }
+}
+
+function openChatGPT(){
+  if($('output').classList.contains('empty')) generatePrompt();
+  copyPrompt();
+  window.open('https://chatgpt.com/','_blank');
+}
+
+function toast(t){
+  $('toast').textContent=t;
+  $('toast').classList.add('show');
+  setTimeout(()=>$('toast').classList.remove('show'),1800);
+}
+</script>
+</body>
+</html>
