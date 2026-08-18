@@ -119,7 +119,7 @@ button,input,select,textarea{font:inherit}
   <button class="navbtn">👨🏻‍🏫 &nbsp; Teaching Studio</button>
   <button class="navbtn">🎬 &nbsp; Media Studio</button>
   <button class="navbtn">🧠 &nbsp; Prompt Studio</button>
-  <div class="sidefoot">Build 001 • SK Temin</div>
+  <div class="sidefoot">Build 001.1 • SK Temin</div>
 </aside>
 
 <main class="main">
@@ -245,6 +245,20 @@ button,input,select,textarea{font:inherit}
           </select>
         </div>
 
+        <div class="field full">
+          <label>IDENTITI SEKOLAH</label>
+          <select id="schoolLogo" onchange="toggleLogoPreview()">
+            <option value="no">✖️ Tanpa logo SK Temin</option>
+            <option value="yes">✔️ Masukkan logo SK Temin</option>
+          </select>
+          <div id="logoPreview" class="hidden" style="margin-top:10px;padding:12px;border:1px solid #e6e7ed;border-radius:12px;background:#fafafa;align-items:center;gap:12px">
+            <img src="https://raw.githubusercontent.com/skteminofficial/teminhub/main/logo-sk-temin.png" alt="Logo rasmi SK Temin" style="width:58px;height:58px;object-fit:contain">
+            <div style="font-size:12px;color:#60677a"><strong style="display:block;color:#273047">Logo rasmi SK Temin</strong>
+            AI mesti guna fail logo sebenar sebagai reference. Jika tidak dilampirkan, AI mesti tinggalkan ruang logo.
+            <br><a href="https://raw.githubusercontent.com/skteminofficial/teminhub/main/logo-sk-temin.png" target="_blank" rel="noopener" style="color:#6530d8;font-weight:800">Buka logo sebenar ↗</a></div>
+          </div>
+        </div>
+
         <div class="field pro hidden">
           <label>WATAK</label>
           <select id="character">
@@ -358,6 +372,13 @@ function setMode(m){
   $('proBtn').classList.toggle('active',m==='pro');
 }
 
+function toggleLogoPreview(){
+  const box=$('logoPreview');
+  const show=$('schoolLogo').value==='yes';
+  box.classList.toggle('hidden',!show);
+  box.style.display=show?'flex':'none';
+}
+
 function suggest(){
   const t=$('title').value.toLowerCase();
 
@@ -410,7 +431,11 @@ Format/dimensi: ${val('ratio')}.
   p+=`
 Pastikan tipografi jelas, hierarki maklumat kuat, ruang tidak terlalu padat, ejaan Bahasa Melayu tepat dan hasil akhir kelihatan seperti poster sekolah yang direka secara profesional. Jangan tambah maklumat program yang tidak diberikan. Jika menggunakan murid, paparkan murid sekolah rendah Malaysia dengan pakaian yang sopan dan sesuai.
 
-Identiti: SK Temin, Jerantut, Pahang. Gunakan identiti sekolah secara kemas dan tidak berlebihan.`;
+${val('schoolLogo')==='yes'
+? `IDENTITI SEKOLAH / LOGO:
+Gunakan HANYA logo rasmi SK Temin yang dilampirkan oleh pengguna sebagai reference image. JANGAN cipta, lukis semula, ubah, tiru atau mereka logo SK Temin. Jika fail logo sebenar belum dilampirkan kepada AI, TINGGALKAN RUANG KOSONG yang sesuai untuk logo. Jangan gantikan dengan logo rekaan atau simbol sekolah palsu.`
+: `IDENTITI SEKOLAH / LOGO:
+JANGAN masukkan logo SK Temin dan jangan cipta sebarang logo sekolah. Poster ini tidak memerlukan logo sekolah.`}`;
 
   $('output').textContent=p;
   $('output').classList.remove('empty');
