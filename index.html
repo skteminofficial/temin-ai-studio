@@ -119,7 +119,7 @@ button,input,select,textarea{font:inherit}
   <button class="navbtn">👨🏻‍🏫 &nbsp; Teaching Studio</button>
   <button class="navbtn">🎬 &nbsp; Media Studio</button>
   <button class="navbtn">🧠 &nbsp; Prompt Studio</button>
-  <div class="sidefoot">Build 001.1 • SK Temin</div>
+  <div class="sidefoot">Build 001.2 • SK Temin</div>
 </aside>
 
 <main class="main">
@@ -252,11 +252,20 @@ button,input,select,textarea{font:inherit}
             <option value="yes">✔️ Masukkan logo SK Temin</option>
           </select>
           <div id="logoPreview" class="hidden" style="margin-top:10px;padding:12px;border:1px solid #e6e7ed;border-radius:12px;background:#fafafa;align-items:center;gap:12px">
-            <img src="https://raw.githubusercontent.com/skteminofficial/teminhub/main/logo-sk-temin.png" alt="Logo rasmi SK Temin" style="width:58px;height:58px;object-fit:contain">
+            <img src="https://raw.githubusercontent.com/skteminofficial/assets/main/logos/logo-sk-temin.png" alt="Logo rasmi SK Temin" style="width:58px;height:58px;object-fit:contain">
             <div style="font-size:12px;color:#60677a"><strong style="display:block;color:#273047">Logo rasmi SK Temin</strong>
             AI mesti guna fail logo sebenar sebagai reference. Jika tidak dilampirkan, AI mesti tinggalkan ruang logo.
-            <br><a href="https://raw.githubusercontent.com/skteminofficial/teminhub/main/logo-sk-temin.png" target="_blank" rel="noopener" style="color:#6530d8;font-weight:800">Buka logo sebenar ↗</a></div>
+            <br><a href="https://raw.githubusercontent.com/skteminofficial/assets/main/logos/logo-sk-temin.png" target="_blank" rel="noopener" style="color:#6530d8;font-weight:800">Buka logo sebenar ↗</a>
+            &nbsp;•&nbsp; <button type="button" onclick="copyLogoUrl()" style="border:0;background:transparent;color:#6530d8;font-weight:800;cursor:pointer;padding:0">Salin URL logo</button></div>
           </div>
+        </div>
+
+        <div class="field full">
+          <label>MOTTO SK TEMIN</label>
+          <select id="schoolMotto">
+            <option value="no">✖️ Tanpa motto</option>
+            <option value="yes">✔️ Masukkan motto — The More You Do, The More You Get</option>
+          </select>
         </div>
 
         <div class="field pro hidden">
@@ -379,6 +388,12 @@ function toggleLogoPreview(){
   box.style.display=show?'flex':'none';
 }
 
+async function copyLogoUrl(){
+  const u="https://raw.githubusercontent.com/skteminofficial/assets/main/logos/logo-sk-temin.png";
+  try{await navigator.clipboard.writeText(u);toast('URL logo disalin ✓');}
+  catch(e){toast('Tak dapat salin URL');}
+}
+
 function suggest(){
   const t=$('title').value.toLowerCase();
 
@@ -433,9 +448,19 @@ Pastikan tipografi jelas, hierarki maklumat kuat, ruang tidak terlalu padat, eja
 
 ${val('schoolLogo')==='yes'
 ? `IDENTITI SEKOLAH / LOGO:
-Gunakan HANYA logo rasmi SK Temin yang dilampirkan oleh pengguna sebagai reference image. JANGAN cipta, lukis semula, ubah, tiru atau mereka logo SK Temin. Jika fail logo sebenar belum dilampirkan kepada AI, TINGGALKAN RUANG KOSONG yang sesuai untuk logo. Jangan gantikan dengan logo rekaan atau simbol sekolah palsu.`
+Gunakan logo rasmi SK Temin daripada URL rujukan ini:
+https://raw.githubusercontent.com/skteminofficial/assets/main/logos/logo-sk-temin.png
+
+JANGAN cipta, lukis semula, ubah, tiru atau mereka logo SK Temin. Jika sistem AI boleh mengakses imej daripada URL tersebut, gunakan imej asal itu. Jika sistem AI tidak boleh mengakses URL tersebut, TINGGALKAN RUANG KOSONG yang sesuai untuk logo dan jangan gantikan dengan logo rekaan atau simbol sekolah palsu.`
 : `IDENTITI SEKOLAH / LOGO:
-JANGAN masukkan logo SK Temin dan jangan cipta sebarang logo sekolah. Poster ini tidak memerlukan logo sekolah.`}`;
+JANGAN masukkan logo SK Temin dan jangan cipta sebarang logo sekolah. Poster ini tidak memerlukan logo sekolah.`}
+
+${val('schoolMotto')==='yes'
+? `MOTTO SK TEMIN:
+Masukkan motto rasmi berikut dengan ejaan tepat:
+"The More You Do, The More You Get."`
+: `MOTTO SK TEMIN:
+Jangan masukkan motto sekolah.`}`;
 
   $('output').textContent=p;
   $('output').classList.remove('empty');
