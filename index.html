@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>TEMIN AI Studio — Build 2.0</title>
+<title>TEMIN AI Studio — Build 2.1</title>
 <style>
 :root{--purple:#7c3aed;--ink:#172033;--muted:#687086;--line:#e8eaf1;--bg:#f7f7fb;--white:#fff}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -47,6 +47,11 @@ button,input,select,textarea{font:inherit}.hidden{display:none!important}.app{di
   50%{box-shadow:0 0 0 7px rgba(245,158,11,0)}
 }
 @media (prefers-reduced-motion:reduce){.notice-alert{animation:none}}
+
+.weekly-box{grid-column:1/-1;border:1px solid #dbe4f0;background:#f8fbff;border-radius:14px;padding:14px;margin-top:4px}
+.week-row{display:grid;grid-template-columns:80px 42px 1fr 1fr;gap:8px;align-items:center;margin:7px 0}
+.week-row input[type=time]{width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px}
+.week-topic select,.week-topic textarea{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:9px;background:#fff}
 </style>
 </head>
 <body>
@@ -194,14 +199,15 @@ rph:{title:'📚 AI RPH Helper',sub:'RPH TS25 berpandukan Buku Teks & DSKP Tahun
 ['topik','Topik / Tajuk','text','Contoh: Harga Kos, Harga Jual, Untung dan Rugi'],
 ['tempoh','Tempoh PdP','select',['30 minit','60 minit','90 minit','120 minit']],
 ['jenis','Jenis RPH','select',['RPH Harian','RPH Mingguan','RPH Bulanan','RPH Setahun']],
+['output','Format Output','select',['Auto (Disyorkan)','Microsoft Word (.docx)','Microsoft Excel (.xlsx)','Google Docs','Google Sheets','Teks / Jadual sahaja']],
 ['tarikhmode','Tarikh & Minggu','select',['Isi sekarang','Biarkan kosong untuk edit kemudian']],
 ['tarikh','Tarikh','date',''],
 ['minggu','Minggu','text','Contoh: 22'],
 ['masa_mula','Masa Mula','time',''],
 ['masa_tamat','Masa Tamat','time',''],
 ['aras','Tahap Murid','select',['Campuran','Lemah / GALUS','Sederhana','Cemerlang']],
-['fokus','Fokus / Keperluan Khas (optional)','textarea','Contoh: PAK21, kuiz online, pemulihan, aktiviti hands-on'],
-['nota','Nota Tambahan (optional)','textarea','Contoh: guna buku latihan, kerja kumpulan, bahan tertentu']
+['fokus','Fokus / Keperluan Khas (optional)','textarea','Contoh: ICT/komputer, Canva, kuiz online, PAK21, aktiviti hands-on, pemulihan, pengayaan, kerja berkumpulan'],
+['nota','Nota Tambahan (optional)','textarea','Contoh: guna buku latihan, jawab Uji Minda buku teks, kerja rumah, bahan tertentu atau arahan tambahan untuk aktiviti PdP']
 ]}}},writing:{title:'✍️ Writing Assistant',sub:'Semua kerja penulisan sekolah di satu rumah.',tools:{
 surat:{label:'Surat Rasmi',fields:[['jenis','Jenis Surat','select',['Makluman','Jemputan','Permohonan','Penghargaan','Pelepasan','Memo Dalaman']],['tajuk','Perkara / Tajuk','text',''],['penerima','Penerima','text',''],['tujuan','Tujuan / Isi Utama','textarea',''],['nada','Nada','select',['Rasmi & sopan','Ringkas & jelas','Mesra tetapi profesional']]]},
 whatsapp:{label:'Makluman WhatsApp',fields:[['tajuk','Tajuk Makluman','text',''],['sasaran','Kumpulan Sasaran','text',''],['isi','Maklumat Penting','textarea',''],['nada','Nada','select',['Mesra & ringkas','Rasmi','Santai tetapi sopan']]]},
@@ -273,8 +279,13 @@ if(currentModule==='imageedit'){
 if(currentModule==='rph'){
  bindRphDynamic();
  const h=document.createElement('div'); h.id='rphSourceNotice'; h.className='logohelp';
- h.innerHTML='<b>📚 Rujukan Kurikulum:</b> Pilih Tahun + Subjek. Sistem akan masukkan pautan Buku Teks dan DSKP yang tersedia ke dalam prompt. Jika DSKP belum ada dalam database, AI diarahkan supaya tidak mereka SK/SP.';
+ h.innerHTML='<b>📚 Rujukan Kurikulum:</b> Pilih Tahun + Subjek. Sistem akan masukkan pautan Buku Teks dan DSKP ke dalam prompt. AI wajib semak sumber dan tidak boleh mereka SK/SP.';
  box.appendChild(h);
+ const wb=document.createElement('div');wb.id='weeklyBox';wb.className='weekly-box';wb.style.display='none';
+ wb.innerHTML='<b>📅 Jadual PdP Mingguan</b><div style="font-size:11px;color:#64748b;margin:5px 0 9px">Tick hari mengajar dan isi masa sebenar.</div>'+['Isnin','Selasa','Rabu','Khamis','Jumaat'].map((x,i)=>`<div class="week-row"><b>${x}</b><input type="checkbox" id="wk_${i}_on"><input type="time" id="wk_${i}_start"><input type="time" id="wk_${i}_end"></div>`).join('')+`<div class="week-topic"><select id="weeklyTopicMode"><option>AI pecahkan topik mengikut sesi secara automatik</option><option>Saya tentukan subtopik setiap hari</option></select><textarea id="weeklySubtopicText" style="display:none;margin-top:8px" placeholder="Contoh: Rabu — Pengenalan\nKhamis — Pengukuhan\nJumaat — Latihan / Uji Minda"></textarea></div>`;
+ box.appendChild(wb);
+ const j=$('f_jenis');const tw=()=>wb.style.display=(j&&j.value==='RPH Mingguan')?'block':'none';if(j){j.addEventListener('change',tw);tw()}
+ const tm=$('weeklyTopicMode'),tx=$('weeklySubtopicText');if(tm)tm.addEventListener('change',()=>tx.style.display=tm.value.startsWith('Saya')?'block':'none');
 }}
 function data(){const o={};modules[currentModule].tools[currentTool].fields.forEach(([id,label,type])=>{const e=$('f_'+id);o[id]=(type==='file'?(e?.files?.[0]?.name||'Belum dilampirkan'):(e?.value||''))});return o}
 function updateRphSubjects(){
@@ -355,6 +366,7 @@ else if(currentModule==='rph'){
 const ref=(curriculumDB[d.tahun]||{})[d.subjek]||{bt:[],dskp:[]};
 const bt=ref.bt||[], ds=ref.dskp||[];
 const dateText=d.tarikhmode==='Biarkan kosong untuk edit kemudian'?'BIARKAN RUANG TARIKH BOLEH DIEDIT':d.tarikh;
+const weekly=getWeeklySchedule();
 p=`Bina ${d.jenis} TS25 untuk ${d.subjek}, ${d.tahun} berdasarkan FORMAT RPH SK TEMIN di bawah.
 
 MAKLUMAT GURU:
@@ -368,6 +380,7 @@ Masa tamat: ${d.masa_tamat}
 Tahap murid: ${d.aras}
 Fokus/Keperluan khas: ${d.fokus}
 Nota tambahan: ${d.nota}
+${weekly?`\nJADUAL PdP MINGGUAN:\n${weekly}`:''}
 
 RUJUKAN BUKU TEKS RASMI:
 ${bt.map((u,i)=>`Buku Teks${bt.length>1?' Jilid '+(i+1):''}: ${u}`).join('\n')}
@@ -382,56 +395,59 @@ ARAHAN SUMBER — WAJIB:
 4. Jangan cipta nombor halaman buku teks. Nyatakan halaman hanya jika dapat dikenal pasti daripada sumber.
 5. Jika topik guru tidak sepadan dengan sumber, maklumkan dengan jelas; jangan tukar topik secara senyap.
 
-FORMAT RPH SK TEMIN — RINGKAS TS25:
-A. MAKLUMAT PdP
-- Mata Pelajaran
-- Tahun / Kelas
-- Bidang
-- Tajuk / Unit / Topik
-- Minggu
-- Tarikh
-- Hari (tentukan daripada tarikh jika tarikh diberi)
-- Masa
-- Tempoh
+FORMAT & REKA LETAK RPH SK TEMIN:
+- A4 Portrait, SASARAN satu muka surat bagi setiap sesi harian jika masih mudah dibaca.
+- Font Calibri: tajuk 11 pt bold; label 9 pt bold; isi 9 pt; refleksi 8.5–9 pt.
+- Line spacing 1.0, margin narrow, cell padding compact. Jangan turun bawah 8.5 pt.
+- WAJIB guna jadual/kotak dengan border kemas.
+- Header: RANCANGAN PENGAJARAN HARIAN (PdPC).
+- Blok kiri: MATA PELAJARAN + MODUL/UNIT/TOPIK.
+- Blok tengah: KELAS + MASA + TEMPOH.
+- Blok kanan: MINGGU + TARIKH + HARI.
+- MINGGU, TARIKH, HARI, KELAS dan MASA mesti bold dan mudah dilihat sekali imbas.
+- Jangan masukkan imej kulit buku teks.
+- Baris seterusnya: STANDARD KANDUNGAN | STANDARD PEMBELAJARAN | NILAI MURNI | EMK.
+- Aspirasi Murid: pilih hanya yang benar-benar relevan.
 
-B. KURIKULUM
-- Standard Kandungan (kod + pernyataan)
-- Standard Pembelajaran (kod + pernyataan)
-- Nilai Murni
-- EMK
-- Aspirasi Murid: pilih HANYA aspirasi yang benar-benar relevan daripada Pengetahuan, Kemahiran Berfikir, Kemahiran Memimpin, Kemahiran Dwibahasa, Etika dan Kerohanian, Identiti Nasional.
+OBJEKTIF & KRITERIA KEJAYAAN:
+- OP 1–3 sahaja, spesifik dan boleh diukur.
+- KK mesti selari terus dengan OP.
 
-C. OBJEKTIF PEMBELAJARAN (OP)
-- Bina 1–3 objektif yang spesifik, boleh diukur dan sesuai dengan tempoh PdP.
+BBB / SUMBER:
+- Buku teks + halaman hanya jika dapat disahkan.
+- Bahan lain berdasarkan aktiviti sebenar.
 
-D. KRITERIA KEJAYAAN (KK)
-- Setiap KK mesti selari terus dengan OP dan boleh diperhatikan/diukur.
+AKTIVITI PdP — WAJIB RINGKAS:
+Tulis hanya senarai bernombor 1–5/6. Setiap aktiviti maksimum 1–2 ayat pendek.
+JANGAN buat kolum Masa atau Fasa.
+JANGAN pecahkan kepada Set Induksi, Langkah 1, Langkah 2, Penutup atau pecahan minit.
+Aktiviti mesti natural seperti guru menulis RPH sebenar.
 
-E. BBB / SUMBER
-- Buku Teks beserta halaman sebenar jika berjaya dikenal pasti.
-- Bahan lain yang benar-benar digunakan berdasarkan aktiviti.
-
-F. STRATEGI PEMBELAJARAN DAN PEMUDAHCARAAN
-- Pengenalan / Set Induksi
-- Aktiviti langkah demi langkah
-- Penutup
-Aktiviti mesti praktikal untuk murid sekolah rendah, sesuai tahap ${d.aras}, tempoh ${d.tempoh}, dan mengambil kira fokus khas guru.
-
-G. IMPAK / REFLEKSI
-Sediakan ruang boleh edit:
+IMPAK / REFLEKSI:
 _____ / _____ murid mencapai objektif pembelajaran dengan baik dan diberi latihan pengayaan.
 _____ / _____ murid mencapai objektif pembelajaran dengan bimbingan dan diberi latihan pengukuhan.
 _____ / _____ murid belum mencapai objektif pembelajaran dan diberi latihan pemulihan.
 PdP hari ini: ☐ Memuaskan  ☐ Tidak memuaskan
 
-H. TINDAKAN PdP AKAN DATANG
+TINDAKAN PdP AKAN DATANG:
 ☐ PdP diteruskan dengan topik baharu.
 ☐ PdP diulang semula pada pembelajaran akan datang.
 ☐ PdP akan datang ditambah baik dari sudut: __________________________
 
-Jika jenis yang dipilih ialah RPH Mingguan/Bulanan/Setahun, susun mengikut minggu/hari secara kemas dan elakkan mengulang teks generik yang sama. Tarikh/minggu yang diminta kosong mesti kekal sebagai ruang editable.
+RPH MINGGUAN:
+Jika RPH Mingguan dipilih, WAJIB hasilkan RPH untuk SETIAP hari yang ditanda dalam Jadual PdP Mingguan — bukan satu hari sahaja.
+Jika AI pecahkan topik dipilih, agihkan kandungan secara logik mengikut bilangan sesi berdasarkan DSKP dan buku teks.
+Jika guru menentukan subtopik, ikut pembahagian guru.
 
-Gunakan Bahasa Melayu profesional, padat dan mesra guru. Elakkan RPH terlalu panjang. Keutamaan ialah RPH yang praktikal, tepat kepada DSKP/Buku Teks dan mudah disalin ke Word/Google Docs.`;
+FORMAT OUTPUT:
+Pilihan guru: ${d.output}
+- Auto: RPH Harian/Mingguan utamakan Microsoft Word (.docx); Bulanan/Setahun utamakan Microsoft Excel (.xlsx).
+- Jika Word dipilih, hasilkan fail .docx sebenar yang editable dengan jadual berkotak.
+- Jika Excel dipilih, hasilkan fail .xlsx sebenar yang editable.
+- Google Docs/Sheets: susun supaya mudah dipindahkan tanpa hilang struktur.
+- Jika platform tidak boleh menghasilkan fail terus, beri jadual yang boleh disalin ke Word/Excel.
+
+Gunakan Bahasa Melayu profesional, padat dan mesra guru. RPH mesti kelihatan seperti dokumen guru sebenar, bukan output AI yang terlalu terperinci.`;
 }
 else if(currentModule==='writing'){const m={
 surat:`Tulis ${d.jenis} dalam Bahasa Melayu yang kemas dan profesional.
