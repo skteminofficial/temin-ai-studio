@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>TEMIN AI Studio — Build 1.7</title>
+<title>TEMIN AI Studio — Build 1.8</title>
 <style>
 :root{--purple:#7c3aed;--ink:#172033;--muted:#687086;--line:#e8eaf1;--bg:#f7f7fb;--white:#fff}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -26,6 +26,27 @@ button,input,select,textarea{font:inherit}.hidden{display:none!important}.app{di
 .filepreview{margin-top:7px;min-height:34px;border:1px dashed #d6d9e2;border-radius:9px;padding:7px;font-size:11px;color:#73798a;display:flex;align-items:center;gap:8px}
 .filepreview img{width:52px;height:42px;object-fit:cover;border-radius:6px}
 .logohelp{grid-column:1/-1;background:#f8f5ff;border:1px solid #e5dcff;border-radius:11px;padding:10px;font-size:12px;color:#655d75}
+
+.notice-alert{
+  grid-column:1/-1;
+  margin-top:6px;
+  padding:14px 16px;
+  border:2px solid #f59e0b;
+  background:#fff8e8;
+  border-radius:12px;
+  font-size:13px;
+  line-height:1.55;
+  color:#6b4500;
+  font-weight:700;
+  animation:noticePulse 1.6s ease-in-out infinite;
+}
+.notice-alert strong{display:block;color:#9a5b00;font-size:14px;margin-bottom:4px}
+.notice-alert span{display:block;font-weight:650}
+@keyframes noticePulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.30)}
+  50%{box-shadow:0 0 0 7px rgba(245,158,11,0)}
+}
+@media (prefers-reduced-motion:reduce){.notice-alert{animation:none}}
 </style>
 </head>
 <body>
@@ -158,8 +179,15 @@ if(type==='file'){const pv=document.createElement('div');pv.id='pv_'+id;pv.class
 if(id==='tarikh')el.addEventListener('change',autoDay);
 box.appendChild(w)})
 if(currentModule==='opr'){
- const h=document.createElement('div');h.className='logohelp';
- h.innerHTML='<b>📎 Nota:</b> Selepas buka ChatGPT / Gemini / Copilot, attach sendiri foto program dan logo (jika digunakan) terus dalam AI tersebut.';
+ const h=document.createElement('div');
+ h.className='notice-alert';
+ h.innerHTML='<strong>⚠️ PENTING — ATTACH FOTO DALAM AI</strong><span>TEMIN AI Studio hanya menyediakan prompt. Selepas buka ChatGPT / Gemini / Copilot, cikgu WAJIB attach sendiri 3–4 foto program dan logo (jika digunakan) terus dalam AI tersebut sebelum hantar prompt.</span>';
+ box.appendChild(h);
+}
+if(currentModule==='imageedit'){
+ const h=document.createElement('div');
+ h.className='notice-alert';
+ h.innerHTML='<strong>⚠️ PENTING — UPLOAD FOTO DALAM AI</strong><span>TEMIN AI Studio hanya menyediakan arahan edit. Selepas buka ChatGPT / Gemini / Copilot, cikgu WAJIB upload foto asal terus dalam AI tersebut sebelum hantar prompt.</span>';
  box.appendChild(h);
 }}
 function data(){const o={};modules[currentModule].tools[currentTool].fields.forEach(([id,label,type])=>{const e=$('f_'+id);o[id]=(type==='file'?(e?.files?.[0]?.name||'Belum dilampirkan'):(e?.value||''))});return o}
