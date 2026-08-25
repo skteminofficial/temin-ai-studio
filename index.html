@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>TEMIN AI Studio — Build 2.1</title>
+<title>TEMIN AI Studio — Build 2.2</title>
 <style>
 :root{--purple:#7c3aed;--ink:#172033;--muted:#687086;--line:#e8eaf1;--bg:#f7f7fb;--white:#fff}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -208,6 +208,15 @@ rph:{title:'📚 AI RPH Helper',sub:'RPH TS25 berpandukan Buku Teks & DSKP Tahun
 ['aras','Tahap Murid','select',['Campuran','Lemah / GALUS','Sederhana','Cemerlang']],
 ['fokus','Fokus / Keperluan Khas (optional)','textarea','Contoh: ICT/komputer, Canva, kuiz online, PAK21, aktiviti hands-on, pemulihan, pengayaan, kerja berkumpulan'],
 ['nota','Nota Tambahan (optional)','textarea','Contoh: guna buku latihan, jawab Uji Minda buku teks, kerja rumah, bahan tertentu atau arahan tambahan untuk aktiviti PdP']
+]},
+rpt:{label:'🧠 Jana RPT Pintar',fields:[
+['tahun','Tahun','select',['Tahun 1','Tahun 2','Tahun 3','Tahun 4','Tahun 5','Tahun 6']],
+['subjek','Mata Pelajaran','select',['Bahasa Melayu','Bahasa Inggeris','Matematik','Sains','Pendidikan Islam','Bahasa Arab','Pendidikan Kesenian','PJPK']],
+['tahun_sesi','Tahun / Sesi Persekolahan','text','Contoh: 2027'],
+['minggu','Anggaran Minggu PdP','select',['Auto cadangkan','36 minggu','38 minggu','40 minggu','42 minggu']],
+['gabung','Topik yang mahu digabungkan (optional)','textarea','Contoh: Ukuran Panjang + Jisim + Isi Padu Cecair'],
+['keutamaan','Keutamaan / Catatan (optional)','textarea','Contoh: lebih masa untuk pecahan, perpuluhan dan peratus; sediakan minggu pengukuhan'],
+['output','Format Output','select',['Microsoft Excel (.xlsx) — Disyorkan','Google Sheets','Microsoft Word (.docx)','Jadual sahaja']]
 ]}}},writing:{title:'✍️ Writing Assistant',sub:'Semua kerja penulisan sekolah di satu rumah.',tools:{
 surat:{label:'Surat Rasmi',fields:[['jenis','Jenis Surat','select',['Makluman','Jemputan','Permohonan','Penghargaan','Pelepasan','Memo Dalaman']],['tajuk','Perkara / Tajuk','text',''],['penerima','Penerima','text',''],['tujuan','Tujuan / Isi Utama','textarea',''],['nada','Nada','select',['Rasmi & sopan','Ringkas & jelas','Mesra tetapi profesional']]]},
 whatsapp:{label:'Makluman WhatsApp',fields:[['tajuk','Tajuk Makluman','text',''],['sasaran','Kumpulan Sasaran','text',''],['isi','Maklumat Penting','textarea',''],['nada','Nada','select',['Mesra & ringkas','Rasmi','Santai tetapi sopan']]]},
@@ -236,7 +245,7 @@ enhance:{label:'✨ Auto Enhance',fields:[
 ['protect','Lindungi Wajah & Struktur','select',['🔒 ON — Kekalkan rupa asal']]
 ]},
 eraser:{label:'🧽 AI Eraser',fields:[['buang','Apa yang hendak dibuang?','textarea','Contoh: padam kerusi di sebelah kanan'],['protect','Lindungi Wajah','select',['🔒 ON — Jangan ubah wajah lain']]]},
-cutout:{label:'✂️ AI Cutout',fields:[['subjek','Subjek yang hendak dikekalkan','text','Contoh: murid di tengah'],['latar','Output Latar','select',['Transparent','Putih','Warna solid']]]},
+cutout:{label:'✂️ Buang Background / Cutout',fields:[['subjek','Subjek yang hendak dikekalkan','text','Contoh: murid di tengah'],['latar','Output Latar','select',['Transparent','Putih','Warna solid']]]},
 upscale:{label:'🔍 AI Upscale',fields:[['skala','Skala','select',['2×','4×']],['detail','Kekalkan rupa asal','select',['Ya — jangan reka detail muka baharu']]]},
 outpaint:{label:'↔️ AI Outpainting',fields:[['arah','Lebarkan ke','select',['Landscape 16:9','Portrait 4:5','Square 1:1','Lebar kiri & kanan','Atas & bawah']],['nota','Arahan tambahan','textarea','Sambung latar secara natural tanpa mengubah subjek asal']]},
 portrait:{label:'👤 AI Portrait',fields:[['gaya','Kemasan','select',['Natural','Professional','Soft portrait']],['protect','Identiti Wajah','select',['🔒 Kekalkan 100% identiti asal']]]},
@@ -284,7 +293,7 @@ if(currentModule==='rph'){
  const wb=document.createElement('div');wb.id='weeklyBox';wb.className='weekly-box';wb.style.display='none';
  wb.innerHTML='<b>📅 Jadual PdP Mingguan</b><div style="font-size:11px;color:#64748b;margin:5px 0 9px">Tick hari mengajar dan isi masa sebenar.</div>'+['Isnin','Selasa','Rabu','Khamis','Jumaat'].map((x,i)=>`<div class="week-row"><b>${x}</b><input type="checkbox" id="wk_${i}_on"><input type="time" id="wk_${i}_start"><input type="time" id="wk_${i}_end"></div>`).join('')+`<div class="week-topic"><select id="weeklyTopicMode"><option>AI pecahkan topik mengikut sesi secara automatik</option><option>Saya tentukan subtopik setiap hari</option></select><textarea id="weeklySubtopicText" style="display:none;margin-top:8px" placeholder="Contoh: Rabu — Pengenalan\nKhamis — Pengukuhan\nJumaat — Latihan / Uji Minda"></textarea></div>`;
  box.appendChild(wb);
- const j=$('f_jenis');const tw=()=>wb.style.display=(j&&j.value==='RPH Mingguan')?'block':'none';if(j){j.addEventListener('change',tw);tw()}
+ const j=$('f_jenis');const tw=()=>wb.style.display=(currentTool==='main'&&j&&j.value==='RPH Mingguan')?'block':'none';if(j){j.addEventListener('change',tw);tw()}
  const tm=$('weeklyTopicMode'),tx=$('weeklySubtopicText');if(tm)tm.addEventListener('change',()=>tx.style.display=tm.value.startsWith('Saya')?'block':'none');
 }}
 function data(){const o={};modules[currentModule].tools[currentTool].fields.forEach(([id,label,type])=>{const e=$('f_'+id);o[id]=(type==='file'?(e?.files?.[0]?.name||'Belum dilampirkan'):(e?.value||''))});return o}
@@ -362,7 +371,51 @@ MOTTO:
 Paparkan hanya teks "The More You Do, The More You Get".
 JANGAN tulis "Motto SK Temin:", "Moto:", "Motto:" atau apa-apa label sebelum ayat tersebut.`;
 }
-else if(currentModule==='rph'){
+else if(currentModule==='rph'&&currentTool==='rpt'){
+const ref=(curriculumDB[d.tahun]||{})[d.subjek]||{bt:[],dskp:[]};
+const bt=ref.bt||[], ds=ref.dskp||[];
+p=`JANA RANCANGAN PENGAJARAN TAHUNAN (RPT) PINTAR untuk ${d.subjek}, ${d.tahun}, sesi ${d.tahun_sesi}.
+
+RUJUKAN BUKU TEKS RASMI:
+${bt.map((u,i)=>`Buku Teks${bt.length>1?' Jilid '+(i+1):''}: ${u}`).join('\n')}
+
+RUJUKAN DSKP RASMI:
+${ds.map(u=>`DSKP: ${u}`).join('\n')}
+
+TETAPAN GURU:
+Anggaran minggu PdP: ${d.minggu}
+Topik yang guru mahu gabungkan: ${d.gabung}
+Keutamaan / Catatan: ${d.keutamaan}
+
+ARAHAN RPT PINTAR — WAJIB:
+1. Semak DSKP sebagai sumber utama Standard Kandungan (SK) dan Standard Pembelajaran (SP). Jangan mereka kod atau pernyataan SK/SP.
+2. Semak Buku Teks untuk urutan unit/topik dan keluasan kandungan.
+3. JANGAN bahagi semua topik sama rata mengikut minggu.
+4. Beri lebih masa kepada topik yang luas, sukar, mempunyai banyak SP, memerlukan pengukuhan atau lazimnya memerlukan beberapa sesi.
+5. Topik kecil atau sangat berkait BOLEH digabungkan secara pedagogi jika munasabah. Contohnya dalam Matematik, topik berkaitan ukuran seperti panjang, jisim dan isi padu cecair boleh dirancang sebagai satu blok jika sesuai dengan DSKP dan buku teks.
+6. Hormati arahan guru tentang topik yang mahu digabungkan.
+7. Sediakan ruang munasabah untuk pengukuhan, pentaksiran, pemulihan/pengayaan dan minggu fleksibel jika jumlah minggu membenarkan.
+8. Jangan mereka tarikh cuti, peperiksaan atau minggu persekolahan rasmi jika tidak diberikan. Gunakan nombor minggu sahaja dan tandakan ruang tarikh sebagai editable jika perlu.
+9. RPT ini akan menjadi pelan induk kepada RPH Harian/Mingguan/Setahun, jadi susunan mesti praktikal dan konsisten.
+
+FORMAT JADUAL:
+Minggu | Cadangan Tarikh (editable) | Unit / Bidang | Tajuk / Topik | Standard Kandungan | Standard Pembelajaran | Cadangan Fokus / Catatan
+
+Selepas jadual, beri bahagian ringkas:
+- Topik yang diperuntukkan lebih masa + sebab
+- Topik yang digabungkan + sebab
+- Minggu pengukuhan/fleksibel yang dicadangkan
+
+FORMAT OUTPUT:
+Pilihan guru: ${d.output}
+Jika Microsoft Excel dipilih, hasilkan fail .xlsx sebenar yang boleh dimuat turun dan diedit, dengan tajuk kolum jelas, wrap text dan lebar kolum sesuai.
+Jika Google Sheets dipilih, susun dalam format spreadsheet yang mudah dipindahkan.
+Jika Word dipilih, gunakan jadual landscape jika perlu.
+Jangan hasilkan penerangan berjela-jela di luar RPT.
+
+Gunakan Bahasa Melayu profesional dan praktikal untuk kegunaan guru sekolah rendah.`;
+}
+else if(currentModule==='rph'&&currentTool==='main'){
 const ref=(curriculumDB[d.tahun]||{})[d.subjek]||{bt:[],dskp:[]};
 const bt=ref.bt||[], ds=ref.dskp||[];
 const dateText=d.tarikhmode==='Biarkan kosong untuk edit kemudian'?'BIARKAN RUANG TARIKH BOLEH DIEDIT':d.tarikh;
