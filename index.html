@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>TEMIN AI Studio — Build 1.8</title>
+<title>TEMIN AI Studio — Build 1.9</title>
 <style>
 :root{--purple:#7c3aed;--ink:#172033;--muted:#687086;--line:#e8eaf1;--bg:#f7f7fb;--white:#fff}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -95,6 +95,7 @@ const $=id=>document.getElementById(id);
 const logoURL='https://raw.githubusercontent.com/skteminofficial/assets/main/logos/logo-sk-temin.png';
 let currentModule='poster',currentTool='main';
 
+const curriculumDB={"Tahun 1":{"Bahasa Melayu":{"bt":["https://online.fliphtml5.com/laiqy/odzx/#p=1"],"dskp":[]},"Bahasa Inggeris":{"bt":["https://online.fliphtml5.com/kvvwr/reqm/#p=1"],"dskp":[]},"Matematik":{"bt":["https://anyflip.com/fzatu/jfbe/basic/101-124","https://online.anyflip.com/bkiy/xwcf/mobile/index.html"],"dskp":[]},"Sains":{"bt":["https://online.anyflip.com/njokh/zioe/mobile/index.html"],"dskp":[]},"Pendidikan Islam":{"bt":["https://online.fliphtml5.com/laiqy/ager/#p=1"],"dskp":[]},"Bahasa Arab":{"bt":["https://online.anyflip.com/lhat/orye/mobile/index.html#p=1"],"dskp":[]},"Pendidikan Kesenian":{"bt":["https://anyflip.com/qfhzb/sngj/basic"],"dskp":["https://anyflip.com/dhwlh/tphd/basic"]},"PJPK":{"bt":["https://online.anyflip.com/njokh/zejq/mobile/index.html"],"dskp":["https://anyflip.com/gcmje/mwbk/basic"]}},"Tahun 2":{"Bahasa Melayu":{"bt":["https://anyflip.com/bgwa/ojwj/basic","https://online.fliphtml5.com/jfuhh/kfzb/#p=3"],"dskp":["https://anyflip.com/uwmzb/emib/basic"]},"Bahasa Inggeris":{"bt":["https://online.anyflip.com/uxtmx/xqwt/mobile/index.html"],"dskp":["https://anyflip.com/waaac/dfjt/basic"]},"Matematik":{"bt":["https://online.fliphtml5.com/fcyht/lpld/#p=2","https://fliphtml5.com/jfuhh/qsit/Buku_Teks_Matematik_Tahun_2_Jilid_2/"],"dskp":["https://anyflip.com/zbeqy/sgxw/basic"]},"Sains":{"bt":["https://online.fliphtml5.com/lytgx/mtbz/#p=1"],"dskp":["https://anyflip.com/rvsx/tfgg/basic/51-80"]},"Pendidikan Islam":{"bt":["https://online.anyflip.com/nkgxb/ksdq/mobile/index.html"],"dskp":["https://anyflip.com/flxql/snaa/basic"]},"Bahasa Arab":{"bt":["https://online.anyflip.com/lhat/wymk/mobile/index.html#p=1"],"dskp":["https://online.anyflip.com/douc/rien/mobile/index.html"]},"Pendidikan Kesenian":{"bt":["https://anyflip.com/htcdz/hvsg/basic"],"dskp":["https://anyflip.com/spwtw/frul/basic"]},"PJPK":{"bt":["https://online.anyflip.com/mfsij/riig/mobile/index.html"],"dskp":["https://anyflip.com/gcmje/wxwr/basic"]}}};
 const modules={
 poster:{title:'🖼️ AI Poster Generator',sub:'Khas untuk poster sahaja.',tools:{main:{label:'Poster',fields:[
 ['tajuk','Tajuk / Program','text','Contoh: Karnival Sains dan Matematik'],
@@ -116,11 +117,17 @@ poster:{title:'🖼️ AI Poster Generator',sub:'Khas untuk poster sahaja.',tool
 ['motto','Motto SK Temin','select',['✖️ Tidak','✔️ Ya']],
 ['extra','Maklumat Tambahan','textarea','Contoh: penganjur, tema warna, syarat pertandingan, nombor untuk dihubungi, QR/link, dress code, tagline atau arahan khas.']
 ]}}},
-rph:{title:'📚 AI RPH Helper',sub:'Fokus 100% pada RPH.',tools:{main:{label:'RPH Helper',fields:[
-['subjek','Subjek','text','Contoh: Matematik'],['tahun','Tahun / Tingkatan','text','Contoh: Tahun 6'],['topik','Topik','text',''],['tempoh','Tempoh PdP','text','Contoh: 60 minit'],
-['jenis','Tempoh RPH','select',['1 RPH','Mingguan','Bulanan','Setahun']],['tarikhmode','Tarikh & Minggu','select',['Isi sekarang','Biarkan kosong untuk edit kemudian']],['tarikh','Tarikh / Minggu','text',''],
-['aras','Tahap Murid','select',['Campuran','Lemah / GALUS','Sederhana','Cemerlang']],['sumber','Sumber Kurikulum','select',['Knowledge DSKP (akan diaktifkan)','Pengetahuan AI','Rujukan sendiri']],
-['rujukan','Rujukan / Pautan','textarea',''],['output','Output Dikehendaki','select',['Prompt sahaja','DOCX (akan datang)','XLSX (akan datang)']],['nota','Nota Tambahan','textarea','']
+rph:{title:'📚 AI RPH Helper',sub:'RPH berpandukan sumber Buku Teks & DSKP yang telah didaftarkan.',tools:{main:{label:'RPH Helper',fields:[
+['tahun','Tahun','select',['Tahun 1','Tahun 2']],
+['subjek','Subjek','select',['Bahasa Melayu','Bahasa Inggeris','Matematik','Sains','Pendidikan Islam','Bahasa Arab','Pendidikan Kesenian','PJPK']],
+['topik','Topik / Tajuk','text','Contoh: Tambah dan Tolak'],
+['tempoh','Tempoh PdP','select',['30 minit','60 minit','90 minit','120 minit']],
+['jenis','Tempoh RPH','select',['1 RPH','Mingguan','Bulanan','Setahun']],
+['tarikhmode','Tarikh & Minggu','select',['Isi sekarang','Biarkan kosong untuk edit kemudian']],
+['tarikh','Tarikh / Minggu','text','Contoh: Minggu 12 / 25 Ogos 2026'],
+['aras','Tahap Murid','select',['Campuran','Lemah / GALUS','Sederhana','Cemerlang']],
+['fokus','Fokus / Keperluan Khas (optional)','textarea','Contoh: aktiviti hands-on, PAK21, pemulihan, pengayaan'],
+['nota','Nota Tambahan (optional)','textarea','Maklumat lain yang cikgu mahu AI ambil kira']
 ]}}},
 writing:{title:'✍️ Writing Assistant',sub:'Semua kerja penulisan sekolah di satu rumah.',tools:{
 surat:{label:'Surat Rasmi',fields:[['jenis','Jenis Surat','select',['Makluman','Jemputan','Permohonan','Penghargaan','Pelepasan','Memo Dalaman']],['tajuk','Perkara / Tajuk','text',''],['penerima','Penerima','text',''],['tujuan','Tujuan / Isi Utama','textarea',''],['nada','Nada','select',['Rasmi & sopan','Ringkas & jelas','Mesra tetapi profesional']]]},
@@ -189,6 +196,11 @@ if(currentModule==='imageedit'){
  h.className='notice-alert';
  h.innerHTML='<strong>⚠️ PENTING — UPLOAD FOTO DALAM AI</strong><span>TEMIN AI Studio hanya menyediakan arahan edit. Selepas buka ChatGPT / Gemini / Copilot, cikgu WAJIB upload foto asal terus dalam AI tersebut sebelum hantar prompt.</span>';
  box.appendChild(h);
+}
+if(currentModule==='rph'){
+ const h=document.createElement('div'); h.id='rphSourceNotice'; h.className='logohelp';
+ h.innerHTML='<b>📚 Rujukan Kurikulum:</b> Pilih Tahun + Subjek. Sistem akan masukkan pautan Buku Teks dan DSKP yang tersedia ke dalam prompt. Jika DSKP belum ada dalam database, AI diarahkan supaya tidak mereka SK/SP.';
+ box.appendChild(h);
 }}
 function data(){const o={};modules[currentModule].tools[currentTool].fields.forEach(([id,label,type])=>{const e=$('f_'+id);o[id]=(type==='file'?(e?.files?.[0]?.name||'Belum dilampirkan'):(e?.value||''))});return o}
 function autoDay(){
@@ -250,6 +262,51 @@ if((d.motto||'').includes('Ya'))p+=`
 MOTTO:
 Paparkan hanya teks "The More You Do, The More You Get".
 JANGAN tulis "Motto SK Temin:", "Moto:", "Motto:" atau apa-apa label sebelum ayat tersebut.`;
+}
+else if(currentModule==='rph'){
+const ref=(curriculumDB[d.tahun]||{})[d.subjek]||{bt:[],dskp:[]};
+const bt=ref.bt||[], ds=ref.dskp||[];
+p=`Bina ${d.jenis} untuk ${d.subjek}, ${d.tahun}.
+
+MAKLUMAT PdP
+Topik/Tajuk: ${d.topik}
+Tempoh: ${d.tempoh}
+Tarikh/Minggu: ${d.tarikhmode==='Biarkan kosong untuk edit kemudian'?'BIARKAN RUANG TARIKH/MINGGU BOLEH DIEDIT':d.tarikh}
+Tahap murid: ${d.aras}
+Fokus/Keperluan khas: ${d.fokus}
+Nota tambahan: ${d.nota}
+
+RUJUKAN BUKU TEKS RASMI YANG DIBERIKAN:
+${bt.length?bt.map((u,i)=>`Buku Teks ${bt.length>1?'Jilid '+(i+1):''}: ${u}`).join('\n'):'Tiada pautan buku teks dalam database.'}
+
+RUJUKAN DSKP YANG DIBERIKAN:
+${ds.length?ds.map(u=>`DSKP: ${u}`).join('\n'):'DSKP BELUM TERSEDIA DALAM DATABASE UNTUK KOMBINASI INI.'}
+
+ARAHAN PENTING:
+1. Gunakan DSKP yang diberikan sebagai sumber utama untuk Standard Kandungan (SK) dan Standard Pembelajaran (SP).
+2. Gunakan buku teks yang diberikan untuk kandungan/topik, urutan pembelajaran, contoh dan aktiviti yang relevan.
+3. JANGAN mereka, meneka atau mencipta nombor/ayat SK dan SP.
+4. Jika pautan DSKP tidak tersedia atau tidak boleh diakses, nyatakan "SK/SP perlu disahkan oleh guru" dan jangan mendakwa SK/SP telah disahkan.
+5. Jika topik yang diminta tidak dapat disahkan daripada sumber, beritahu dengan jelas dan jangan menggantikannya dengan topik lain secara senyap.
+6. Sesuaikan aktiviti dengan tahap murid ${d.aras} dan tempoh ${d.tempoh}.
+
+FORMAT RPH:
+- Mata Pelajaran
+- Tahun
+- Tarikh / Hari / Masa (jika diberi)
+- Tajuk / Topik
+- Standard Kandungan
+- Standard Pembelajaran
+- Objektif Pembelajaran yang boleh diukur
+- Kriteria Kejayaan
+- Pengetahuan Sedia Ada (jika relevan)
+- BBM / Sumber
+- Aktiviti langkah demi langkah (Set Induksi → Aktiviti Utama → Penutup)
+- Pentaksiran / Evidens
+- Pemulihan dan Pengayaan jika sesuai
+- Refleksi (sediakan ruang untuk guru isi selepas PdP)
+
+Gunakan Bahasa Melayu yang kemas, praktikal dan sesuai terus diedit oleh guru.`;
 }
 else if(currentModule==='writing'){const m={
 surat:`Tulis ${d.jenis} dalam Bahasa Melayu yang kemas dan profesional.
@@ -328,7 +385,7 @@ DILARANG: mengubah atau mereka semula wajah, facial features, ekspresi, bentuk b
 
 TIPOGRAFI & KANDUNGAN
 Gunakan Bahasa Melayu yang tepat. Jangan mereka fakta yang tidak diberikan. Jangan ubah nama, tarikh, masa, peserta atau objektif. Gunakan hierarki tajuk yang jelas dan ikon/dekorasi secara terkawal.`;
-if((d.logo||'').includes('Sertakan'))p+=`
+if((d.logo||'').includes('SK Temin'))p+=`
 
 LOGO RASMI SK TEMIN
 Fail logo rasmi SK Temin hendaklah ATTACH bersama prompt ini. Gunakan logo yang dilampirkan secara tepat. Jangan redraw, regenerate, stylize, tukar warna, ubah teks atau cipta logo pengganti.
@@ -347,8 +404,7 @@ Jangan masukkan logo sekolah.`;
 p+=`
 
 LANGKAH TERAKHIR:
-Selepas prompt ini ditampal ke ChatGPT / Gemini / Copilot, pengguna akan attach foto program sebenar dan logo (jika dipilih) terus dalam chat AI tersebut.
-Jangan anggap nama fail dalam TEMIN AI Studio sebagai attachment.
+Saya akan attach foto program sebenar terus dalam chat AI ini. Gunakan foto tersebut selepas ia dilampirkan.
 
 Hasilkan hanya SATU muka surat OPR.`;
 }
