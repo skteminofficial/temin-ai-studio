@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>TEMIN AI Studio — Build 1.4</title>
+<title>TEMIN AI Studio — Build 1.6</title>
 <style>
 :root{--purple:#7c3aed;--ink:#172033;--muted:#687086;--line:#e8eaf1;--bg:#f7f7fb;--white:#fff}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -22,6 +22,10 @@ button,input,select,textarea{font:inherit}.hidden{display:none!important}.app{di
 .output.empty{color:#858b9d;display:grid;place-items:center;text-align:center}.note{font-size:12px;color:#6d7485}.toast{position:fixed;right:24px;bottom:24px;background:#172033;color:#fff;padding:12px 16px;border-radius:10px;opacity:0}.toast.show{opacity:1}
 @media(max-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:900px){.sidebar{display:none}.app{display:block}.workspace{grid-template-columns:1fr}.main{padding:16px}}
 @media(max-width:600px){.grid{grid-template-columns:1fr 1fr}.fields{grid-template-columns:1fr}.field.full{grid-column:auto}.panel{padding:16px}}
+
+.filepreview{margin-top:7px;min-height:34px;border:1px dashed #d6d9e2;border-radius:9px;padding:7px;font-size:11px;color:#73798a;display:flex;align-items:center;gap:8px}
+.filepreview img{width:52px;height:42px;object-fit:cover;border-radius:6px}
+.logohelp{grid-column:1/-1;background:#f8f5ff;border:1px solid #e5dcff;border-radius:11px;padding:10px;font-size:12px;color:#655d75}
 </style>
 </head>
 <body>
@@ -39,7 +43,7 @@ button,input,select,textarea{font:inherit}.hidden{display:none!important}.app{di
 
 <main class="main">
 <section id="home">
-<div class="hero"><small>✦ TEMIN AI STUDIO</small><h1>Create Faster.<br>Teach Smarter.</h1><p>Lima fungsi utama.Berbeza Peranan.</p></div>
+<div class="hero"><small>✦ TEMIN AI STUDIO</small><h1>Create Faster.<br>Teach Smarter.</h1><p>Enam fungsi utama. Berbeza Peranan.</p></div>
 <div class="grid">
 <div class="card" onclick="openModule('poster')"><div class="icon">🖼️</div><h3>AI Poster Generator</h3><p>Khas poster hebahan, program dan pertandingan.</p></div>
 <div class="card" onclick="openModule('rph')"><div class="icon">📚</div><h3>AI RPH Helper</h3><p>Khas RPH — harian hingga tahunan.</p></div>
@@ -72,14 +76,24 @@ let currentModule='poster',currentTool='main';
 
 const modules={
 poster:{title:'🖼️ AI Poster Generator',sub:'Khas untuk poster sahaja.',tools:{main:{label:'Poster',fields:[
-['tajuk','Tajuk / Program','text','Contoh: Karnival Sains dan Matematik'],['tarikh','Tarikh','text',''],['masa','Masa','text',''],['tempat','Tempat','text',''],['sasaran','Sasaran / Peserta','text',''],
+['tajuk','Tajuk / Program','text','Contoh: Karnival Sains dan Matematik'],
+['tarikh','Tarikh','date',''],
+['masa_mula','Masa Mula','time',''],
+['masa_tamat','Masa Tamat (optional)','time',''],
+['tempat','Tempat','text','Contoh: Arena Hebat'],
+['sasaran','Sasaran / Peserta','text','Contoh: Murid Tahap 2'],
 ['jenis','Jenis Poster','select',['Hebahan WhatsApp','Program Sekolah','Pertandingan','Rasmi','Fun / Ceria']],
 ['gaya','Gaya','select',['Ceria & moden','Pastel lembut','Rasmi & premium','Kartun','3D','Watercolor','Flat design','Realistik']],
-['watak','Watak','select',['Boy & Girl','Boy','Girl bertudung','Guru','Ibu bapa','Tanpa watak']],
-['pakaian','Pakaian','select',['Uniform sekolah Malaysia','Baju PJ SK Temin','Pengawas sekolah (ungu)','PSS (kuning cair)','SPBT (hijau)','PRS (biru cair)','Pengakap','Pandu Puteri Tunas','PPIM','BSMM','TKRS']],
-['latar','Latar / Venue Visual','select',['Sekolah','Kelas','Dewan','Padang','Hutan','Makmal','Pejabat']],
-['dimensi','Dimensi','select',['WhatsApp / 4:5','A4 Portrait','A4 Landscape','Square 1:1','Story 9:16','Landscape 16:9']],
-['logo','Logo SK Temin','select',['✖️ Tidak','✔️ Ya']],['motto','Motto SK Temin','select',['✖️ Tidak','✔️ Ya']],['extra','Maklumat Tambahan','textarea','']
+['watak','Watak','select',['Murid sahaja','Guru sahaja','Ibu bapa sahaja','Murid + Guru','Murid + Ibu Bapa','Guru + Ibu Bapa','Murid + Guru + Ibu Bapa','Boy & Girl','Tanpa watak','Lain-lain']],
+['watak_lain','Watak Lain-lain (optional)','text','Contoh: Guru Besar bersama murid'],
+['pakaian','Pakaian','select',['Uniform sekolah Malaysia','Baju PJ SK Temin','Pengawas sekolah (ungu)','PSS (kuning cair)','SPBT (hijau)','PRS (biru cair)','Pengakap','Pandu Puteri Tunas','PPIM','BSMM','TKRS','Bebas / pakaian sesuai','Lain-lain']],
+['pakaian_lain','Pakaian Lain-lain (optional)','text','Contoh: Baju tradisional Melayu'],
+['latar','Latar / Venue Visual','select',['Sekolah','Kelas','Dewan','Padang','Hutan','Makmal','Pejabat','Rumah','Bandar','Alam semula jadi','Lain-lain']],
+['latar_lain','Latar Lain-lain (optional)','text','Contoh: Dataran sekolah dengan pentas'],
+['dimensi','Dimensi','select',['WhatsApp / 4:5','A4 Portrait','A4 Landscape','Square 1:1','Story 9:16','⭐ Smart TV / Landscape 16:9 (Recommended)']],
+['logo_file','Upload Logo (optional)','file','image/*'],
+['motto','Motto SK Temin','select',['✖️ Tidak','✔️ Ya']],
+['extra','Maklumat Tambahan','textarea','Contoh: penganjur, tema warna, syarat pertandingan, nombor untuk dihubungi, QR/link, dress code, tagline atau arahan khas.']
 ]}}},
 rph:{title:'📚 AI RPH Helper',sub:'Fokus 100% pada RPH.',tools:{main:{label:'RPH Helper',fields:[
 ['subjek','Subjek','text','Contoh: Matematik'],['tahun','Tahun / Tingkatan','text','Contoh: Tahun 6'],['topik','Topik','text',''],['tempoh','Tempoh PdP','text','Contoh: 60 minit'],
@@ -97,48 +111,71 @@ laporan:{label:'Laporan / Rumusan',fields:[['program','Program / Aktiviti','text
 }},
 opr:{title:'📊 AI One Page Report',sub:'Kandungan ikut format OPR SK Temin; visual diserahkan kepada AI supaya lebih kreatif.',tools:{main:{label:'OPR Prompt Builder',fields:[
 ['tajuk','Tajuk Program / Aktiviti','text','Contoh: Pertandingan Kuiz Bola Sepak'],
-['tarikh','Tarikh','text','Contoh: 20 Ogos 2026'],['hari','Hari','text','Contoh: Khamis'],['masa','Masa','text','Contoh: 8.00 pagi – 10.00 pagi'],
+['tarikh','Tarikh','date',''],['hari','Hari (auto)','text','Auto ikut tarikh'],['masa','Masa','text','Contoh: 8.00 pagi – 10.00 pagi'],
 ['peserta','Peserta / Sasaran','text','Contoh: Murid Tahap 2'],['jumlah','Jumlah Peserta (optional)','text','Contoh: 120 orang'],
 ['tempat','Tempat (optional)','text','Contoh: Makmal Komputer'],
-['objektif','Objektif Program / Aktiviti','textarea','Taip sendiri atau guna butang Cadangkan untuk saya'],
+['objektif','Objektif Program / Aktiviti','textarea','Taip sendiri atau klik Cadangkan untuk saya'],
 ['aktiviti','Ringkasan Aktiviti (optional)','textarea','Ringkaskan aktiviti yang dilaksanakan'],
 ['guru','Disediakan Oleh','text','Nama guru'],
 ['gaya','Gaya OPR','select',['🎲 Surprise Me','Modern Collage','Creative School','Corporate Clean','Pastel School','Bold Infographic','Minimal Editorial']],
 ['warna','Warna','select',['Auto ikut gambar','Warna SK Temin','Pastel','Biru','Hijau','Custom']],
-['gambar','Bilangan Gambar','select',['3 gambar','4 gambar']],
-['logo','Logo SK Temin','select',['✔️ Ya','✖️ Tidak / upload sendiri']],
+['logo','Logo Sekolah','select',['✔️ Sertakan Logo SK Temin','📤 Upload Logo Sendiri','✖️ Tanpa Logo']],
+['logo_file','Attach / Upload Logo','file','image/*'],
+['foto1','Foto Program 1','file','image/*'],['foto2','Foto Program 2','file','image/*'],
+['foto3','Foto Program 3','file','image/*'],['foto4','Foto Program 4 (optional)','file','image/*'],
 ['nota','Arahan Tambahan','textarea','Contoh: satu gambar hero, tema sukan, gunakan ikon minimal']
 ]}}},
 imageedit:{title:'🪄 AI Image Editor',sub:'Kemaskan atau edit gambar tanpa guru perlu pandai menulis prompt.',tools:{
-enhance:{label:'✨ Auto Enhance',fields:[
+enhance:{label:'✨ Auto Enhance',fields:[['image','Upload Foto','file','image/*'],
 ['tujuan','Arahan','select',['Auto Enhance keseluruhan','Cerah & kemaskan gambar gelap','Tajamkan gambar kurang jelas','Kurangkan noise','Pulihkan warna']],
 ['upscale','AI Upscale','select',['Auto jika perlu','2×','4×','Tidak']],
 ['protect','Lindungi Wajah & Struktur','select',['🔒 ON — Kekalkan rupa asal']]
 ]},
-eraser:{label:'🧽 AI Eraser',fields:[['buang','Apa yang hendak dibuang?','textarea','Contoh: padam kerusi di sebelah kanan'],['protect','Lindungi Wajah','select',['🔒 ON — Jangan ubah wajah lain']]]},
-cutout:{label:'✂️ AI Cutout',fields:[['subjek','Subjek yang hendak dikekalkan','text','Contoh: murid di tengah'],['latar','Output Latar','select',['Transparent','Putih','Warna solid']]]},
-upscale:{label:'🔍 AI Upscale',fields:[['skala','Skala','select',['2×','4×']],['detail','Kekalkan rupa asal','select',['Ya — jangan reka detail muka baharu']]]},
-outpaint:{label:'↔️ AI Outpainting',fields:[['arah','Lebarkan ke','select',['Landscape 16:9','Portrait 4:5','Square 1:1','Lebar kiri & kanan','Atas & bawah']],['nota','Arahan tambahan','textarea','Sambung latar secara natural tanpa mengubah subjek asal']]},
-portrait:{label:'👤 AI Portrait',fields:[['gaya','Kemasan','select',['Natural','Professional','Soft portrait']],['protect','Identiti Wajah','select',['🔒 Kekalkan 100% identiti asal']]]},
-adjust:{label:'⚙️ Manual Adjust',fields:[
+eraser:{label:'🧽 AI Eraser',fields:[['image','Upload Foto','file','image/*'],['buang','Apa yang hendak dibuang?','textarea','Contoh: padam kerusi di sebelah kanan'],['protect','Lindungi Wajah','select',['🔒 ON — Jangan ubah wajah lain']]]},
+cutout:{label:'✂️ AI Cutout',fields:[['image','Upload Foto','file','image/*'],['subjek','Subjek yang hendak dikekalkan','text','Contoh: murid di tengah'],['latar','Output Latar','select',['Transparent','Putih','Warna solid']]]},
+upscale:{label:'🔍 AI Upscale',fields:[['image','Upload Foto','file','image/*'],['skala','Skala','select',['2×','4×']],['detail','Kekalkan rupa asal','select',['Ya — jangan reka detail muka baharu']]]},
+outpaint:{label:'↔️ AI Outpainting',fields:[['image','Upload Foto','file','image/*'],['arah','Lebarkan ke','select',['Landscape 16:9','Portrait 4:5','Square 1:1','Lebar kiri & kanan','Atas & bawah']],['nota','Arahan tambahan','textarea','Sambung latar secara natural tanpa mengubah subjek asal']]},
+portrait:{label:'👤 AI Portrait',fields:[['image','Upload Foto','file','image/*'],['gaya','Kemasan','select',['Natural','Professional','Soft portrait']],['protect','Identiti Wajah','select',['🔒 Kekalkan 100% identiti asal']]]},
+adjust:{label:'⚙️ Manual Adjust',fields:[['image','Upload Foto','file','image/*'],
 ['brightness','Brightness','text','Contoh: +10'],['contrast','Contrast','text','Contoh: +5'],['saturation','Saturation','text','Contoh: +8'],['sharpness','Sharpness','text','Contoh: +10'],
 ['highlights','Highlights','text','Contoh: -5'],['shadows','Shadows','text','Contoh: +10'],['hue','Hue','text','Contoh: 0'],['bw','B&W','select',['Tidak','Ya']]
 ]}
 }},
 prompt:{title:'💡 Smart Prompt Library',sub:'Untuk tugasan kecil yang tak perlukan modul khas.',tools:{
-objektif:{label:'Objektif Program',fields:[['program','Nama Program','text',''],['sasaran','Sasaran','text',''],['fokus','Fokus Program','textarea',''],['bilangan','Bilangan Objektif','select',['3','4','5']]]},
-refleksi:{label:'Refleksi Ringkas',fields:[['aktiviti','Aktiviti / PdP','text',''],['situasi','Apa yang berlaku','textarea',''],['gaya','Gaya','select',['Ringkas','Profesional','Dengan tindakan susulan']]]},
-caption:{label:'Caption Media Sosial',fields:[['program','Program / Aktiviti','text',''],['highlight','Highlight','textarea',''],['platform','Platform','select',['Facebook','WhatsApp','Telegram']],['nada','Nada','select',['Ceria','Rasmi','Santai']]]},
-idea:{label:'Idea Aktiviti / Nama Program',fields:[['konteks','Konteks / Topik','text',''],['sasaran','Sasaran','text',''],['jenis','Jenis Idea','select',['Nama program','Aktiviti','Slogan / tagline','Intervensi umum']],['bilangan','Bilangan Cadangan','select',['5','10','15']]]},
-custom:{label:'Custom Prompt',fields:[['tujuan','Apa cikgu nak AI bantu?','textarea',''],['format','Format Output','text','Contoh: senarai, jadual, perenggan ringkas']]}
+objektif:{label:'Objektif Program',fields:[['program','Nama Program','text',''],['sasaran','Sasaran','text',''],['fokus','Fokus Program','textarea',''],['url','Pautan URL (optional)','url','Contoh: borang, pertandingan, rujukan atau maklumat lanjut'],['bilangan','Bilangan Objektif','select',['3','4','5']]]},
+refleksi:{label:'Refleksi Ringkas',fields:[['aktiviti','Aktiviti / PdP','text',''],['situasi','Apa yang berlaku','textarea',''],['url','Pautan URL (optional)','url','Jika ada bahan/rujukan berkaitan'],['gaya','Gaya','select',['Ringkas','Profesional','Dengan tindakan susulan']]]},
+caption:{label:'Caption Media Sosial',fields:[['program','Program / Aktiviti','text',''],['highlight','Highlight','textarea',''],['url','Pautan URL (optional)','url','Contoh: pautan penyertaan / Google Form'],['platform','Platform','select',['Facebook','WhatsApp','Telegram']],['nada','Nada','select',['Ceria','Rasmi','Santai']]]},
+idea:{label:'Idea Aktiviti / Nama Program',fields:[['konteks','Konteks / Topik','text',''],['sasaran','Sasaran','text',''],['url','Pautan URL (optional)','url','Jika ada rujukan / pertandingan / borang'],['jenis','Jenis Idea','select',['Nama program','Aktiviti','Slogan / tagline','Intervensi umum']],['bilangan','Bilangan Cadangan','select',['5','10','15']]]},
+custom:{label:'Custom Prompt',fields:[['tujuan','Apa cikgu nak AI bantu?','textarea',''],['url','Pautan URL (optional)','url','Contoh: borang survey, pertandingan, bahan rujukan'],['format','Format Output','text','Contoh: senarai, jadual, perenggan ringkas']]}
 }}
 };
 
 function showHome(){$('module').classList.add('hidden');$('home').classList.remove('hidden');scrollTo(0,0)}
 function openModule(name){currentModule=name;currentTool=Object.keys(modules[name].tools)[0];$('home').classList.add('hidden');$('module').classList.remove('hidden');$('moduleTitle').textContent=modules[name].title;$('moduleSub').textContent=modules[name].sub;renderTabs();renderForm();clearOutput();scrollTo(0,0)}
 function renderTabs(){const box=$('toolTabs');box.innerHTML='';Object.entries(modules[currentModule].tools).forEach(([k,t])=>{const b=document.createElement('button');b.className='tooltab'+(k===currentTool?' active':'');b.textContent=t.label;b.onclick=()=>{currentTool=k;renderTabs();renderForm();clearOutput()};box.appendChild(b)})}
-function renderForm(){const tool=modules[currentModule].tools[currentTool];$('formTitle').textContent=tool.label;const box=$('formFields');box.innerHTML='';tool.fields.forEach(([id,label,type,opts])=>{const w=document.createElement('div');w.className='field'+(type==='textarea'?' full':'');const lab=document.createElement('label');lab.textContent=label;w.appendChild(lab);let el;if(type==='select'){el=document.createElement('select');opts.forEach(o=>{const op=document.createElement('option');op.textContent=o;el.appendChild(op)})}else if(type==='textarea'){el=document.createElement('textarea');el.rows=4;el.placeholder=opts||''}else{el=document.createElement('input');el.placeholder=opts||''}el.id='f_'+id;w.appendChild(el);box.appendChild(w)})}
-function data(){const o={};modules[currentModule].tools[currentTool].fields.forEach(([id])=>o[id]=$('f_'+id)?.value||'');return o}
+function renderForm(){const tool=modules[currentModule].tools[currentTool];$('formTitle').textContent=tool.label;const box=$('formFields');box.innerHTML='';tool.fields.forEach(([id,label,type,opts])=>{const w=document.createElement('div');w.className='field'+(type==='textarea'?' full':'');const lab=document.createElement('label');lab.textContent=label;w.appendChild(lab);let el;if(type==='select'){el=document.createElement('select');opts.forEach(o=>{const op=document.createElement('option');op.textContent=o;el.appendChild(op)})}else if(type==='textarea'){el=document.createElement('textarea');el.rows=4;el.placeholder=opts||''}
+else if(type==='file'){el=document.createElement('input');el.type='file';el.accept=opts||'image/*'}
+else{el=document.createElement('input');el.type=(type==='date'?'date':type==='time'?'time':type==='url'?'url':'text');el.placeholder=opts||''}
+el.id='f_'+id;w.appendChild(el);
+if(type==='file'){const pv=document.createElement('div');pv.id='pv_'+id;pv.className='filepreview';pv.textContent='Belum pilih fail';w.appendChild(pv);el.addEventListener('change',()=>previewFile(id,el))}
+if(id==='tarikh')el.addEventListener('change',autoDay);
+box.appendChild(w)})
+if(currentModule==='opr'){
+ const h=document.createElement('div');h.className='logohelp';
+ h.innerHTML='<b>Logo SK Temin:</b> jika GPT/Gemini/Copilot tidak boleh mengambil logo daripada URL, attach fail logo bersama foto program. Logo tidak dikira sebagai Foto 1–4.';
+ box.appendChild(h);
+}}
+function data(){const o={};modules[currentModule].tools[currentTool].fields.forEach(([id,label,type])=>{const e=$('f_'+id);o[id]=(type==='file'?(e?.files?.[0]?.name||'Belum dilampirkan'):(e?.value||''))});return o}
+function autoDay(){
+ const e=$('f_tarikh'),h=$('f_hari'); if(!e||!h||!e.value)return;
+ const days=['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+ h.value=days[new Date(e.value+'T00:00:00').getDay()];
+}
+function previewFile(id,el){
+ const pv=$('pv_'+id); if(!pv)return; const f=el.files&&el.files[0];
+ if(!f){pv.textContent='Belum pilih fail';return}
+ const r=new FileReader();r.onload=e=>pv.innerHTML=`<img src="${e.target.result}"><span>${f.name}</span>`;r.readAsDataURL(f);
+}
 function suggestFields(){if(currentModule==='poster'){if($('f_gaya'))$('f_gaya').value='Pastel lembut'}if(currentModule==='rph'){if($('f_aras'))$('f_aras').value='Campuran'}
 if(currentModule==='opr'){
  if($('f_gaya'))$('f_gaya').value='🎲 Surprise Me';
@@ -155,26 +192,30 @@ if(currentModule==='poster'){p=`Cipta poster sekolah rendah Malaysia yang kemas,
 
 Tajuk/Program: ${d.tajuk}
 Tarikh: ${d.tarikh}
-Masa: ${d.masa}
+Masa mula: ${d.masa_mula}
+Masa tamat: ${d.masa_tamat}
 Tempat: ${d.tempat}
 Sasaran/Peserta: ${d.sasaran}
 Jenis poster: ${d.jenis}
 Gaya: ${d.gaya}
-Watak: ${d.watak}
-Pakaian: ${d.pakaian}
-Latar visual: ${d.latar}
+Watak: ${d.watak}${d.watak_lain?` — ${d.watak_lain}`:''}
+Pakaian: ${d.pakaian}${d.pakaian_lain?` — ${d.pakaian_lain}`:''}
+Latar visual: ${d.latar}${d.latar_lain?` — ${d.latar_lain}`:''}
 Dimensi: ${d.dimensi}
 Maklumat tambahan: ${d.extra}
 
-Pastikan ejaan Bahasa Melayu tepat dan jangan tambah fakta yang tidak diberi.`;
-if((d.logo||'').includes('Ya'))p+=`
+Pastikan ejaan Bahasa Melayu tepat dan jangan tambah fakta yang tidak diberi.
+Jika dimensi ialah Smart TV / Landscape 16:9, reka khas untuk paparan TV sekolah: teks besar, kontras jelas, maklumat penting mudah dibaca dari jauh dan komposisi landskap yang seimbang.`;
 
-Gunakan logo rasmi SK Temin daripada URL berikut:
-${logoURL}
-Jangan reka, ubah, tiru atau gantikan logo rasmi dengan logo lain.`;
+if(d.logo_file && d.logo_file!=='Belum dilampirkan')p+=`
+
+LOGO:
+Gunakan FAIL LOGO YANG DILAMPIRKAN oleh pengguna secara tepat. Jangan redraw, regenerate, stylize, menukar warna atau mencipta logo pengganti.
+Fail logo: ${d.logo_file}`;
 else p+=`
 
-Jangan masukkan logo SK Temin atau logo sekolah lain.`;
+LOGO:
+Tiada logo dilampirkan. Jangan cipta logo sekolah secara automatik.`;
 if((d.motto||'').includes('Ya'))p+=`
 
 Paparkan teks berikut sahaja tanpa label "Motto", "Motto SK Temin" atau "Motto Rasmi":
@@ -224,41 +265,71 @@ Aktiviti: ${d.aktiviti}
 Impak/Hasil: ${d.impak}
 Gunakan gaya profesional dan padat.`};p=m[currentTool]||''}
 else if(currentModule==='opr'){
-p=`Hasilkan ONE PAGE REPORT (OPR) sekolah dalam SATU HALAMAN SAHAJA. Reka bentuk mesti kreatif, profesional, kemas dan tidak kelihatan seperti borang atau jadual biasa.
+const photos=[d.foto1,d.foto2,d.foto3,d.foto4].filter(x=>x&&x!=='Belum dilampirkan');
+p=`HASILKAN ONE PAGE REPORT (OPR) SEKOLAH DALAM SATU HALAMAN SAHAJA.
 
-KANDUNGAN WAJIB:
+Jangan hasilkan reka bentuk seperti borang, jadual kaku atau template laporan biasa. Gunakan kreativiti visual profesional berdasarkan gambar sebenar yang dilampirkan. Kandungan wajib mesti kekal tepat tetapi susun atur visual bebas dan menarik.
+
+KANDUNGAN WAJIB
 KOD SEKOLAH: CBA2050
 NAMA SEKOLAH: SEKOLAH KEBANGSAAN TEMIN
 TAJUK PROGRAM / AKTIVITI: ${d.tajuk}
 TARIKH: ${d.tarikh}
 HARI: ${d.hari}
 MASA: ${d.masa}
+TEMPAT: ${d.tempat}
 PESERTA / SASARAN: ${d.peserta}
 JUMLAH PESERTA: ${d.jumlah}
-TEMPAT: ${d.tempat}
-OBJEKTIF PROGRAM / AKTIVITI: ${d.objektif}
-RINGKASAN AKTIVITI: ${d.aktiviti}
+OBJEKTIF PROGRAM / AKTIVITI:
+${d.objektif}
+RINGKASAN AKTIVITI:
+${d.aktiviti}
 DISEDIAKAN OLEH: ${d.guru}
 
-ARAHAN REKA BENTUK:
-- Gaya: ${d.gaya}
-- Warna: ${d.warna}
-- Susun ${d.gambar} secara kreatif. Jangan paksa semua gambar menjadi grid petak seragam.
-- AI bebas memilih komposisi terbaik seperti hero photo + supporting photos, asymmetric collage, overlap, diagonal, rounded frame, polaroid atau editorial layout.
-- Pastikan semua maklumat mudah dibaca dan OPR benar-benar muat SATU HALAMAN.
-- Jangan mereka fakta, nama, tarikh, jumlah atau aktiviti yang tidak diberikan.
-- Gunakan ikon/dekorasi secara terkawal dan sesuai dengan tema program.
+ARAHAN VISUAL
+Gaya: ${d.gaya}
+Palet warna: ${d.warna}
+Bilangan foto program dilampirkan: ${photos.length}
+Arahan tambahan: ${d.nota}
 
-PHOTO PRESERVATION — STRICT:
-Gunakan foto yang dimuat naik sebagai FOTO ASAL dan sebagai evidens sebenar program. Kekalkan semua individu dan struktur visual asal. Dibenarkan hanya enhancement fotografi seperti brightness/exposure, contrast, white balance, saturation, sharpening, noise reduction, color correction dan AI upscaling. Crop, resize dan sedikit rotation untuk layout dibenarkan.
-JANGAN regenerate, redraw, reconstruct, beautify atau mengubah wajah, facial features, ekspresi, bentuk badan, pakaian, tangan, bilangan individu, objek, latar atau adegan asal. Jangan tambah atau membuang individu. Foto mesti kekal autentik.`;
-if((d.logo||'').includes('Ya'))p+=`
+Susun foto berdasarkan komposisi yang paling sesuai dengan kandungan foto. AI bebas menggunakan satu foto hero dengan supporting photos, asymmetric collage, editorial composition, overlap terkawal, diagonal frame, rounded frame atau gaya polaroid. JANGAN paksa semua foto menjadi grid petak seragam. Pastikan hasil akhir tetap kemas, seimbang, mudah dibaca dan MUAT SATU HALAMAN.
 
-LOGO:
-Gunakan logo rasmi SK Temin yang dilampirkan / diberikan oleh pengguna. Jangan reka semula atau menggantikan logo dengan logo AI. Jika logo tidak tersedia kepada sistem AI, minta pengguna upload fail logo sebelum menghasilkan OPR.`;
+PHOTO PRESERVATION — STRICT
+Semua foto yang dilampirkan ialah EVIDENS SEBENAR PROGRAM. Gunakan foto asal tersebut; jangan recreate atau generate semula foto.
+Dibenarkan: crop, resize, rotation kecil, brightness/exposure correction, contrast, white balance, saturation, highlights/shadows, sharpening, noise reduction, color correction dan AI upscale.
+DILARANG: mengubah atau mereka semula wajah, facial features, ekspresi, bentuk badan, pakaian, tangan, bilangan individu, objek, latar atau struktur adegan. Jangan tambah atau buang individu. Jangan tukar muka. Foto mesti kekal autentik walaupun layout di sekelilingnya kreatif.
+
+TIPOGRAFI & KANDUNGAN
+Gunakan Bahasa Melayu yang tepat. Jangan mereka fakta yang tidak diberikan. Jangan ubah nama, tarikh, masa, peserta atau objektif. Gunakan hierarki tajuk yang jelas dan ikon/dekorasi secara terkawal.`;
+if((d.logo||'').includes('Sertakan'))p+=`
+
+LOGO RASMI SK TEMIN
+Fail logo rasmi SK Temin hendaklah ATTACH bersama prompt ini. Gunakan logo yang dilampirkan secara tepat. Jangan redraw, regenerate, stylize, tukar warna, ubah teks atau cipta logo pengganti.
+URL rujukan logo rasmi (fallback sahaja):
+https://raw.githubusercontent.com/skteminofficial/assets/main/logos/logo-sk-temin.png
+Jika sistem tidak boleh mengakses URL, gunakan FAIL LOGO YANG DILAMPIRKAN.`;
+else if((d.logo||'').includes('Upload'))p+=`
+
+LOGO
+Gunakan fail logo yang pengguna lampirkan secara tepat. Jangan recreate atau stylize logo.`;
+else p+=`
+
+LOGO
+Jangan masukkan logo sekolah.`;
+
+p+=`
+
+FAIL YANG PERLU DILAMPIRKAN BERSAMA PROMPT:
+${(d.logo||'').includes('Tanpa')?'':'• Logo: '+d.logo_file}
+${photos.map((x,i)=>`• Foto ${i+1}: ${x}`).join('\n')}
+
+Hasilkan hanya SATU muka surat OPR.`;
 }
 else if(currentModule==='imageedit'){
 const common=`
+
+FAIL FOTO YANG DILAMPIRKAN: ${d.image}
+Gunakan foto yang dilampirkan sebagai imej sumber untuk edit ini.
 
 PRESERVATION RULE:
 Kekalkan identiti, wajah, bentuk badan dan struktur asal gambar kecuali bahagian yang pengguna secara jelas minta untuk diubah. Jangan buat perubahan sampingan pada muka atau individu lain.`;
@@ -273,11 +344,11 @@ adjust:`Laraskan foto asal dengan tetapan: Brightness ${d.brightness}, Contrast 
 };p=m[currentTool]||'';
 }
 else if(currentModule==='prompt'){const m={
-objektif:`Bina ${d.bilangan} objektif yang jelas dan realistik untuk program "${d.program}", sasaran ${d.sasaran}. Fokus program: ${d.fokus}.`,
-refleksi:`Tulis refleksi ${d.gaya} untuk aktiviti/PdP "${d.aktiviti}". Situasi sebenar: ${d.situasi}.`,
-caption:`Tulis caption ${d.platform} untuk aktiviti "${d.program}". Highlight: ${d.highlight}. Nada: ${d.nada}.`,
-idea:`Cadangkan ${d.bilangan} ${d.jenis} berdasarkan konteks "${d.konteks}" untuk sasaran ${d.sasaran}.`,
-custom:`Bina prompt AI yang jelas dan lengkap untuk tujuan berikut: ${d.tujuan}. Format output yang dikehendaki: ${d.format}.`};p=m[currentTool]||''}
+objektif:`Bina ${d.bilangan} objektif yang jelas dan realistik untuk program "${d.program}", sasaran ${d.sasaran}. Fokus program: ${d.fokus}.${d.url?` Pautan berkaitan yang perlu dikekalkan/dimasukkan jika relevan: ${d.url}`:""}`,
+refleksi:`Tulis refleksi ${d.gaya} untuk aktiviti/PdP "${d.aktiviti}". Situasi sebenar: ${d.situasi}.${d.url?` Rujukan URL: ${d.url}`:""}`,
+caption:`Tulis caption ${d.platform} untuk aktiviti "${d.program}". Highlight: ${d.highlight}. Nada: ${d.nada}.${d.url?` Masukkan pautan berikut dengan tepat dan mudah diklik: ${d.url}`:""}`,
+idea:`Cadangkan ${d.bilangan} ${d.jenis} berdasarkan konteks "${d.konteks}" untuk sasaran ${d.sasaran}.${d.url?` Gunakan pautan ini sebagai rujukan jika relevan: ${d.url}`:""}`,
+custom:`Bina prompt AI yang jelas dan lengkap untuk tujuan berikut: ${d.tujuan}. Format output yang dikehendaki: ${d.format}.${d.url?` Sertakan/rujuk pautan berikut dengan tepat: ${d.url}`:""}`};p=m[currentTool]||''}
 else p='Modul One Page Report akan dibina dalam build khas seterusnya.';
 $('output').textContent=p.trim();$('output').classList.remove('empty')}
 function clearOutput(){$('output').textContent='✨\n\nPrompt akan muncul di sini.';$('output').classList.add('empty')}
