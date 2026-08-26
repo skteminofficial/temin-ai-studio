@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>TEMIN AI Studio — Build 2.5</title>
+<title>TEMIN AI Studio — Build 2.6</title>
 <style>
 :root{--purple:#7c3aed;--ink:#172033;--muted:#687086;--line:#e8eaf1;--bg:#f7f7fb;--white:#fff}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -57,7 +57,7 @@ button,input,select,textarea{font:inherit}.hidden{display:none!important}.app{di
 .week-row{grid-template-columns:80px 42px 1fr 1fr 105px!important}
 .rph-daily-only.rph-hide{display:none!important}
 @media(max-width:650px){.week-row{grid-template-columns:68px 38px 1fr 1fr 88px!important}}
-</style>
+.source-material-only{display:none}.source-material-only.source-show{display:flex}.source-manual-only.source-hide{display:none}</style>
 </head>
 <body>
 <div class="app">
@@ -178,7 +178,8 @@ const curriculumDB={
 };
 const modules={
 poster:{title:'🖼️ AI Poster Generator',sub:'Khas untuk poster sahaja.',tools:{main:{label:'Poster',fields:[
-['sumber','Sumber Maklumat Poster','select',['✍️ Isi Sendiri','📷 Rujuk Bahan Sedia Ada (flyer/banner/tentatif/jadual/screenshot)']],
+['sumber','Sumber Maklumat Poster','select',['✍️ Isi Sendiri','📋 Guna Bahan Sedia Ada']],
+['bahan','Tampal Maklumat / Bahan Asal','textarea','Tampal teks WhatsApp, surat, tentatif, jadual bertugas atau maklumat program. Jika gambar/PDF, attach terus selepas buka AI.'],
 ['tajuk','Tajuk / Program','text','Contoh: Karnival Sains dan Matematik'],
 ['tarikh','Tarikh','date',''],
 ['masa_mula','Masa Mula','time',''],
@@ -232,7 +233,8 @@ ucapan:{label:'Teks Pengacara / Ucapan',fields:[['acara','Acara / Majlis','text'
 laporan:{label:'Laporan / Rumusan',fields:[['program','Program / Aktiviti','text',''],['tarikh','Tarikh / Tempat','text',''],['aktiviti','Apa yang berlaku','textarea',''],['impak','Impak / Hasil','textarea',''],['panjang','Panjang','select',['Sangat ringkas','1 perenggan','3 perenggan']]]}
 }},
 opr:{title:'📊 AI One Page Report',sub:'Kandungan ikut format OPR SK Temin; visual diserahkan kepada AI supaya lebih kreatif.',tools:{main:{label:'OPR Prompt Builder',fields:[
-['sumber','Sumber Maklumat Program','select',['✍️ Isi Sendiri','📷 Rujuk Bahan Sedia Ada (flyer/banner/tentatif/screenshot)']],
+['sumber','Sumber Maklumat Program','select',['✍️ Isi Sendiri','📋 Guna Bahan Sedia Ada']],
+['bahan','Tampal Maklumat / Bahan Asal','textarea','Tampal teks WhatsApp, surat, tentatif, jadual atau maklumat program. Jika gambar/PDF, attach terus selepas buka AI.'],
 ['tajuk','Tajuk Program / Aktiviti','text','Contoh: Pertandingan Kuiz Bola Sepak'],
 ['hero','Pemilihan Hero Photo','select',['🤖 AI pilih foto terbaik','📌 Saya tentukan sendiri selepas attach']],
 ['tarikh','Tarikh','date',''],['hari','Hari (auto)','text','Auto ikut tarikh'],['masa_mula','Masa Mula','time',''],['masa_tamat','Masa Tamat (optional)','time',''],
@@ -278,6 +280,9 @@ function renderForm(){const tool=modules[currentModule].tools[currentTool];$('fo
 else if(type==='file'){el=document.createElement('input');el.type='file';el.accept=opts||'image/*'}
 else{el=document.createElement('input');el.type=(type==='date'?'date':type==='time'?'time':type==='url'?'url':'text');el.placeholder=opts||''}
 el.id='f_'+id;
+if(currentModule==='opr'&&currentTool==='main'&&['tajuk','tarikh','hari','masa_mula','masa_tamat','tempat','peserta'].includes(id))w.classList.add('source-manual-only');
+if(currentModule==='poster'&&currentTool==='main'&&['tajuk','tarikh','masa_mula','masa_tamat','tempat','sasaran','penganjur'].includes(id))w.classList.add('source-manual-only');
+if((currentModule==='opr'||currentModule==='poster')&&currentTool==='main'&&id==='bahan')w.classList.add('source-material-only');
 if(currentModule==='rph'&&currentTool==='main'&&['tarikh','masa_mula','masa_tamat'].includes(id))w.classList.add('rph-daily-only');
 w.appendChild(el);
 if(type==='file'){const pv=document.createElement('div');pv.id='pv_'+id;pv.className='filepreview';pv.textContent='Belum pilih fail';w.appendChild(pv);el.addEventListener('change',()=>previewFile(id,el))}
@@ -294,6 +299,9 @@ if(currentModule==='imageedit'){
  h.className='notice-alert';
  h.innerHTML='<strong>⚠️ PENTING — UPLOAD FOTO DALAM AI</strong><span>TEMIN AI Studio hanya menyediakan arahan edit. Selepas buka ChatGPT / Gemini / Copilot, cikgu WAJIB upload foto asal terus dalam AI tersebut sebelum hantar prompt.</span>';
  box.appendChild(h);
+}
+if((currentModule==='opr'||currentModule==='poster')&&currentTool==='main'){
+ const sm=$('f_sumber'); const sync=()=>{const m=sm&&sm.value.includes('Guna Bahan Sedia Ada');document.querySelectorAll('.source-manual-only').forEach(x=>x.classList.toggle('source-hide',m));document.querySelectorAll('.source-material-only').forEach(x=>x.classList.toggle('source-show',m));};if(sm){sm.addEventListener('change',sync);sync()}
 }
 if(currentModule==='rph'){
  bindRphDynamic();
@@ -416,6 +424,12 @@ Maklumat tambahan: ${d.extra}
 Pastikan ejaan Bahasa Melayu tepat dan jangan tambah fakta yang tidak diberi.
 Jika dimensi ialah Smart TV / Landscape 16:9, reka khas untuk paparan TV sekolah: teks besar, kontras jelas, maklumat penting mudah dibaca dari jauh dan komposisi landskap yang seimbang.`;
 
+p+=`
+
+LOGO PRESERVATION — STRICT:
+Jika logo sebenar dilampirkan, gunakan aset logo itu sendiri. HANYA resize secara proportional dan position.
+JANGAN redraw, regenerate, trace, stylize, reinterpret, crop, stretch atau ubah bentuk, warna, simbol, tulisan atau nisbah logo.
+Jika platform tidak mampu mengekalkan logo dengan tepat, OMIT logo. Jangan cipta logo gantian dan jangan buat placeholder/bulatan putih/kotak kosong. Design mesti tetap lengkap tanpa logo.`;
 if((d.logo||'').includes('SK Temin'))p+=`
 
 LOGO:
@@ -599,6 +613,9 @@ Impak/Hasil: ${d.impak}
 Gunakan gaya profesional dan padat.`};p=m[currentTool]||''}
 else if(currentModule==='opr'){
 p=`HASILKAN ONE PAGE REPORT (OPR) SEKOLAH DALAM SATU HALAMAN SAHAJA.
+CANVAS WAJIB: A4 PORTRAIT EXACT — 210 × 297 mm, aspect ratio 1:1.414.
+Sasaran print quality: 300 DPI / 2480 × 3508 px atau resolusi tertinggi yang platform sokong.
+JANGAN guna 2:3, 4:5 atau portrait ratio lain. Penuhi kanvas A4 dengan safe margin sesuai untuk cetakan.
 
 Jangan hasilkan reka bentuk seperti borang, jadual kaku atau template laporan biasa. Gunakan kreativiti visual profesional berdasarkan gambar sebenar yang dilampirkan. Kandungan wajib mesti kekal tepat tetapi susun atur visual bebas dan menarik.
 
@@ -625,8 +642,10 @@ Paparkan hanya: "The More You Do, The More You Get"
 JANGAN tulis label "Motto SK Temin:", "Moto:" atau "Motto:".
 
 SUMBER MAKLUMAT:
-${d.sumber}
-Jika "📷 Rujuk Bahan Sedia Ada" dipilih, pengguna akan attach flyer/banner/tentatif/screenshot terus dalam chat AI selepas prompt ini. Baca dan ekstrak maklumat dengan tepat. Jangan mereka fakta yang tiada atau tidak jelas. Maklumat manual guru mengatasi bacaan gambar jika bercanggah.
+Mod: ${d.sumber}
+BAHAN TEKS:
+${d.bahan||'(Tiada teks ditampal — bahan mungkin gambar/PDF yang akan di-attach selepas buka AI.)'}
+Jika "📋 Guna Bahan Sedia Ada" dipilih, bahan boleh berupa teks WhatsApp, surat, flyer, banner, pamflet, tentatif, jadual, screenshot, gambar atau PDF. Ekstrak maklumat terus daripada bahan. Jangan minta guru menaip semula tajuk, tarikh, masa, tempat, sasaran atau tentatif yang sudah jelas. Jangan mereka fakta. Maklumat sebenar/override guru mengatasi bahan asal.
 
 MAKLUMAT PROGRAM:
 TARIKH: ${d.tarikh}
