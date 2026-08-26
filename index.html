@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>TEMIN AI Studio — Build 2.6</title>
+<title>TEMIN AI Studio — Build 2.7</title>
 <style>
 :root{--purple:#7c3aed;--ink:#172033;--muted:#687086;--line:#e8eaf1;--bg:#f7f7fb;--white:#fff}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -188,12 +188,16 @@ poster:{title:'🖼️ AI Poster Generator',sub:'Khas untuk poster sahaja.',tool
 ['sasaran','Sasaran / Peserta','text','Contoh: Murid Tahap 2'],
 ['jenis','Jenis Poster','select',['Hebahan WhatsApp','Program Sekolah','Pertandingan','Rasmi','Fun / Ceria']],
 ['gaya','Gaya','select',['Ceria & moden','Pastel lembut','Rasmi & premium','Kartun','3D','Watercolor','Flat design','Realistik']],
-['watak','Watak','select',['Murid sahaja','Guru sahaja','Ibu bapa sahaja','Murid + Guru','Murid + Ibu Bapa','Guru + Ibu Bapa','Murid + Guru + Ibu Bapa','Boy & Girl','Tanpa watak','Lain-lain']],
+['watak','Watak','select',['🤖 Auto berdasarkan bahan','Murid sahaja','Guru sahaja','Ibu bapa sahaja','Murid + Guru','Murid + Ibu Bapa','Guru + Ibu Bapa','Murid + Guru + Ibu Bapa','Boy & Girl','Tanpa watak','Lain-lain']],
 ['watak_lain','Watak Lain-lain (optional)','text','Contoh: Guru Besar bersama murid'],
-['pakaian','Pakaian','select',['Uniform sekolah Malaysia','Baju PJ SK Temin','Pengawas sekolah (ungu)','PSS (kuning cair)','SPBT (hijau)','PRS (biru cair)','Pengakap','Pandu Puteri Tunas','PPIM','BSMM','TKRS','Bebas / pakaian sesuai','Lain-lain']],
+['pakaian','Pakaian','select',['🤖 Auto berdasarkan bahan','Uniform sekolah Malaysia','Baju PJ SK Temin','Pengawas sekolah (ungu)','PSS (kuning cair)','SPBT (hijau)','PRS (biru cair)','Pengakap','Pandu Puteri Tunas','PPIM','BSMM','TKRS','Bebas / pakaian sesuai','Lain-lain']],
 ['pakaian_lain','Pakaian Lain-lain (optional)','text','Contoh: Baju tradisional Melayu'],
-['latar','Latar / Venue Visual','select',['Sekolah','Kelas','Dewan','Padang','Hutan','Makmal','Pejabat','Rumah','Bandar','Alam semula jadi','Lain-lain']],
+['latar','Latar / Venue Visual','select',['🤖 Auto berdasarkan bahan','Sekolah','Kelas','Dewan','Padang','Hutan','Makmal','Pejabat','Rumah','Bandar','Alam semula jadi','Lain-lain']],
 ['latar_lain','Latar Lain-lain (optional)','text','Contoh: Dataran sekolah dengan pentas'],
+['waktu','Waktu / Pencahayaan','select',['🤖 Auto berdasarkan bahan','Pagi','Tengah Hari','Petang','Golden Hour','Senja','Malam']],
+['cuaca','Cuaca','select',['🤖 Auto berdasarkan bahan','Cerah','Mendung','Hujan','Hujan Lebat','Berkabus','Selepas Hujan']],
+['atmosfera','Atmosphere','select',['🤖 Auto berdasarkan bahan','Ceria','Tenang','Meriah','Adventure','Dramatik','Misteri','Segar','Cinematic']],
+['kamera','POV / Kamera','select',['🤖 Auto berdasarkan bahan','Eye Level','Wide Angle','Panoramic','Aerial / Drone','Low Angle','Close-up','Hero Shot','POV','Selfie','Wefie / Group Selfie','Interview POV — tangan + mikrofon wartawan','Candid Documentary','Over-the-Shoulder','Behind-the-Scenes','Walking Shot','Top-down / Flat Lay','Cinematic Wide']],
 ['dimensi','Dimensi','select',['WhatsApp / 4:5','A4 Portrait','A4 Landscape','Square 1:1','Story 9:16','⭐ Smart TV / Landscape 16:9 (Recommended)']],
 ['logo','Logo','select',['✖️ Tanpa Logo','✔️ Logo SK Temin — attach dalam AI','📎 Logo lain — attach dalam AI']],
 ['motto','Motto SK Temin','select',['✖️ Tidak','✔️ Ya']],
@@ -244,8 +248,8 @@ opr:{title:'📊 AI One Page Report',sub:'Kandungan ikut format OPR SK Temin; vi
 ['aktiviti','Ringkasan Aktiviti (optional)','textarea','Ringkaskan aktiviti yang dilaksanakan'],
 ['guru','Disediakan Oleh','text','Nama guru'],
 ['gaya','Gaya OPR','select',['🎲 Surprise Me','Modern Collage','Creative School','Corporate Clean','Pastel School','Bold Infographic','Minimal Editorial']],
-['warna','Warna','select',['Auto ikut gambar','Warna SK Temin','Pastel','Biru','Hijau','Custom']],
-['logo','Logo Sekolah','select',['✔️ Logo SK Temin — attach dalam AI','📎 Logo lain — attach dalam AI','✖️ Tanpa Logo']],['foto_count','Bilangan Foto Program','select',['3 foto','4 foto']],
+['warna','Warna','select',['🤖 Auto berdasarkan bahan','Auto ikut gambar','Warna SK Temin','Pastel','Biru','Hijau','Custom']],
+['logo','Logo Sekolah','select',['✔️ Logo SK Temin — attach dalam AI','📎 Logo lain — attach dalam AI','✖️ Tanpa Logo']],
 ['nota','Arahan Tambahan','textarea','Contoh: satu gambar hero, tema sukan, gunakan ikon minimal']
 ]}}},
 imageedit:{title:'🪄 AI Image Editor',sub:'Kemaskan atau edit gambar tanpa guru perlu pandai menulis prompt.',tools:{
@@ -291,7 +295,7 @@ box.appendChild(w)})
 if(currentModule==='opr'){
  const h=document.createElement('div');
  h.className='notice-alert';
- h.innerHTML='<strong>⚠️ PENTING — ATTACH FOTO DALAM AI</strong><span>TEMIN AI Studio hanya menyediakan prompt. Selepas buka ChatGPT / Gemini / Copilot, cikgu WAJIB attach sendiri 3–4 foto program dan logo (jika digunakan) terus dalam AI tersebut sebelum hantar prompt.</span>';
+ h.innerHTML='<strong>⚠️ PENTING — ATTACH FOTO DALAM AI</strong><span>TEMIN AI Studio hanya menyediakan prompt. Selepas buka ChatGPT / Gemini / Copilot, cikgu WAJIB attach sendiri sehingga 6 foto program dan logo (jika digunakan) terus dalam AI tersebut sebelum hantar prompt.</span>';
  box.appendChild(h);
 }
 if(currentModule==='imageedit'){
@@ -418,6 +422,11 @@ Gaya: ${d.gaya}
 Watak: ${d.watak}${d.watak_lain?` — ${d.watak_lain}`:''}
 Pakaian: ${d.pakaian}${d.pakaian_lain?` — ${d.pakaian_lain}`:''}
 Latar visual: ${d.latar}${d.latar_lain?` — ${d.latar_lain}`:''}
+Waktu / pencahayaan: ${d.waktu}
+Cuaca: ${d.cuaca}
+Atmosphere: ${d.atmosfera}
+POV / Kamera: ${d.kamera}
+Jika setting = "🤖 Auto berdasarkan bahan", tentukan sendiri berdasarkan SUMBER UTAMA.
 Dimensi: ${d.dimensi}
 Maklumat tambahan: ${d.extra}
 
@@ -643,8 +652,15 @@ JANGAN tulis label "Motto SK Temin:", "Moto:" atau "Motto:".
 
 SUMBER MAKLUMAT:
 Mod: ${d.sumber}
-BAHAN TEKS:
+SUMBER UTAMA — WAJIB BACA SEPENUHNYA:
 ${d.bahan||'(Tiada teks ditampal — bahan mungkin gambar/PDF yang akan di-attach selepas buka AI.)'}
+
+SMART SOURCE — WAJIB:
+1. Ekstrak SEMUA fakta penting daripada sumber: tajuk, tarikh, masa, tempat, bayaran, tarikh tutup, sasaran, penyertaan, nama, jadual, nombor telefon, pautan dan arahan penting.
+2. Jangan ringkaskan sehingga fakta penting hilang dan jangan mereka/membetulkan fakta.
+3. Selepas memahami bahan, INFER visual secara automatik daripada konteks. Contoh: perkhemahan TKRS/KRS → kadet/uniform berkaitan, campsite/outdoor, disiplin/adventure dan suasana yang sesuai.
+4. Semua setting bernilai "🤖 Auto berdasarkan bahan" mesti dipilih oleh AI berdasarkan konteks sumber, bukan dianggap kosong.
+5. Setting manual guru mengatasi Auto.
 Jika "📋 Guna Bahan Sedia Ada" dipilih, bahan boleh berupa teks WhatsApp, surat, flyer, banner, pamflet, tentatif, jadual, screenshot, gambar atau PDF. Ekstrak maklumat terus daripada bahan. Jangan minta guru menaip semula tajuk, tarikh, masa, tempat, sasaran atau tentatif yang sudah jelas. Jangan mereka fakta. Maklumat sebenar/override guru mengatasi bahan asal.
 
 MAKLUMAT PROGRAM:
@@ -667,6 +683,7 @@ Palet warna: ${d.warna}
 Arahan tambahan: ${d.nota}
 
 ADAPTIVE PHOTO LAYOUT — WAJIB:
+DO NOT FORCE A FIXED PHOTO COUNT. Pengguna boleh attach sehingga 6 foto. Analisis semua foto dan gunakan hanya jumlah yang paling sesuai dengan komposisi OPR. Tidak wajib guna semua. NEVER duplicate/repeat a photo to fill space.
 Pengguna boleh attach sekitar 3–6 foto aktiviti sebenar. Ini panduan, BUKAN kuota wajib.
 Analisis SEMUA foto yang dilampirkan dan pilih HERO PHOTO terbaik berdasarkan kejelasan, komposisi, kaitan dengan program dan kekuatan visual.
 JANGAN anggap foto pertama sebagai hero secara automatik.
