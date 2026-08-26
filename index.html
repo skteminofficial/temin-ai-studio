@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>TEMIN AI Studio — Build 2.4</title>
+<title>TEMIN AI Studio — Build 2.5</title>
 <style>
 :root{--purple:#7c3aed;--ink:#172033;--muted:#687086;--line:#e8eaf1;--bg:#f7f7fb;--white:#fff}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -178,6 +178,7 @@ const curriculumDB={
 };
 const modules={
 poster:{title:'🖼️ AI Poster Generator',sub:'Khas untuk poster sahaja.',tools:{main:{label:'Poster',fields:[
+['sumber','Sumber Maklumat Poster','select',['✍️ Isi Sendiri','📷 Rujuk Bahan Sedia Ada (flyer/banner/tentatif/jadual/screenshot)']],
 ['tajuk','Tajuk / Program','text','Contoh: Karnival Sains dan Matematik'],
 ['tarikh','Tarikh','date',''],
 ['masa_mula','Masa Mula','time',''],
@@ -231,7 +232,9 @@ ucapan:{label:'Teks Pengacara / Ucapan',fields:[['acara','Acara / Majlis','text'
 laporan:{label:'Laporan / Rumusan',fields:[['program','Program / Aktiviti','text',''],['tarikh','Tarikh / Tempat','text',''],['aktiviti','Apa yang berlaku','textarea',''],['impak','Impak / Hasil','textarea',''],['panjang','Panjang','select',['Sangat ringkas','1 perenggan','3 perenggan']]]}
 }},
 opr:{title:'📊 AI One Page Report',sub:'Kandungan ikut format OPR SK Temin; visual diserahkan kepada AI supaya lebih kreatif.',tools:{main:{label:'OPR Prompt Builder',fields:[
+['sumber','Sumber Maklumat Program','select',['✍️ Isi Sendiri','📷 Rujuk Bahan Sedia Ada (flyer/banner/tentatif/screenshot)']],
 ['tajuk','Tajuk Program / Aktiviti','text','Contoh: Pertandingan Kuiz Bola Sepak'],
+['hero','Pemilihan Hero Photo','select',['🤖 AI pilih foto terbaik','📌 Saya tentukan sendiri selepas attach']],
 ['tarikh','Tarikh','date',''],['hari','Hari (auto)','text','Auto ikut tarikh'],['masa_mula','Masa Mula','time',''],['masa_tamat','Masa Tamat (optional)','time',''],
 ['peserta','Peserta / Sasaran','text','Contoh: Murid Tahap 2'],['jumlah','Jumlah Peserta (optional)','text','Contoh: 120 orang'],
 ['tempat','Tempat (optional)','text','Contoh: Makmal Komputer'],
@@ -621,6 +624,10 @@ FOOTER TETAP:
 Paparkan hanya: "The More You Do, The More You Get"
 JANGAN tulis label "Motto SK Temin:", "Moto:" atau "Motto:".
 
+SUMBER MAKLUMAT:
+${d.sumber}
+Jika "📷 Rujuk Bahan Sedia Ada" dipilih, pengguna akan attach flyer/banner/tentatif/screenshot terus dalam chat AI selepas prompt ini. Baca dan ekstrak maklumat dengan tepat. Jangan mereka fakta yang tiada atau tidak jelas. Maklumat manual guru mengatasi bacaan gambar jika bercanggah.
+
 MAKLUMAT PROGRAM:
 TARIKH: ${d.tarikh}
 HARI: ${d.hari}
@@ -638,14 +645,24 @@ DISEDIAKAN OLEH: ${d.guru}
 ARAHAN VISUAL
 Gaya: ${d.gaya}
 Palet warna: ${d.warna}
-Bilangan foto program yang akan di-attach terus dalam AI: ${d.foto_count}
 Arahan tambahan: ${d.nota}
 
-Susun foto berdasarkan komposisi yang paling sesuai dengan kandungan foto. AI bebas menggunakan satu foto hero dengan supporting photos, asymmetric collage, editorial composition, overlap terkawal, diagonal frame, rounded frame atau gaya polaroid. JANGAN paksa semua foto menjadi grid petak seragam. Pastikan hasil akhir tetap kemas, seimbang, mudah dibaca dan MUAT SATU HALAMAN.
+ADAPTIVE PHOTO LAYOUT — WAJIB:
+Pengguna boleh attach sekitar 3–6 foto aktiviti sebenar. Ini panduan, BUKAN kuota wajib.
+Analisis SEMUA foto yang dilampirkan dan pilih HERO PHOTO terbaik berdasarkan kejelasan, komposisi, kaitan dengan program dan kekuatan visual.
+JANGAN anggap foto pertama sebagai hero secara automatik.
+Pemilihan hero oleh guru: ${d.hero}
+Jika guru memilih "Saya tentukan sendiri", patuhi arahan seperti "Foto 2 sebagai hero" yang diberi selepas gambar dilampirkan.
+Tidak wajib menggunakan semua foto. Pilih hanya jumlah yang menghasilkan komposisi paling kemas.
+AI bebas menggunakan satu hero photo besar + supporting photos, asymmetric collage, editorial composition, overlap terkawal, diagonal frame, rounded frame atau gaya polaroid.
+JANGAN duplicate/repeat foto yang sama semata-mata untuk memenuhi ruang. Foto hero tidak perlu muncul semula sebagai foto kecil kecuali diminta.
+Jika hanya 3 foto sesuai, gunakan 3 sahaja dan isi ruang lain dengan typography, shape, ikon atau elemen grafik tema.
+Sehingga 6 foto dibenarkan hanya jika layout masih lapang dan mudah dibaca.
+JANGAN paksa semua foto menjadi grid petak seragam. Pastikan hasil akhir kemas, seimbang, mudah dibaca dan MUAT SATU HALAMAN.
 
 PHOTO PRESERVATION — STRICT
 Semua foto yang dilampirkan ialah EVIDENS SEBENAR PROGRAM. Gunakan foto asal tersebut; jangan recreate atau generate semula foto.
-Dibenarkan: crop, resize, rotation kecil, brightness/exposure correction, contrast, white balance, saturation, highlights/shadows, sharpening, noise reduction, color correction dan AI upscale.
+Dibenarkan: crop, reposition, resize, rotation kecil, brightness/exposure correction, contrast, white balance, saturation, highlights/shadows, sharpening, noise reduction, color correction dan AI upscale.
 DILARANG: mengubah atau mereka semula wajah, facial features, ekspresi, bentuk badan, pakaian, tangan, bilangan individu, objek, latar atau struktur adegan. Jangan tambah atau buang individu. Jangan tukar muka. Foto mesti kekal autentik walaupun layout di sekelilingnya kreatif.
 
 TIPOGRAFI & KANDUNGAN
@@ -672,8 +689,13 @@ Jangan masukkan logo sekolah.`;
 
 p+=`
 
-FOTO PROGRAM:
-Saya akan melampirkan foto program sebenar bersama prompt ini. Gunakan foto tersebut selepas ia diberikan.
+BAHAN & FOTO PROGRAM:
+Selepas prompt ini dibuka dalam ChatGPT / Gemini / Copilot, pengguna akan attach sendiri:
+1. Bahan sumber (flyer/banner/tentatif/screenshot) jika mod Rujuk Bahan Sedia Ada dipilih.
+2. Foto aktiviti sebenar yang mahu dipertimbangkan.
+3. Logo sekolah jika diperlukan.
+Jangan anggap fail atau nama fail dalam TEMIN AI Studio sudah menjadi attachment.
+Gunakan hanya foto sebenar selepas ia diberikan.
 
 Hasilkan hanya SATU muka surat OPR.`;
 }
