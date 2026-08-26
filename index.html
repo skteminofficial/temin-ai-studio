@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>TEMIN AI Studio — Build 2.2</title>
+<title>TEMIN AI Studio — Build 2.4</title>
 <style>
 :root{--purple:#7c3aed;--ink:#172033;--muted:#687086;--line:#e8eaf1;--bg:#f7f7fb;--white:#fff}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -52,6 +52,11 @@ button,input,select,textarea{font:inherit}.hidden{display:none!important}.app{di
 .week-row{display:grid;grid-template-columns:80px 42px 1fr 1fr;gap:8px;align-items:center;margin:7px 0}
 .week-row input[type=time]{width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px}
 .week-topic select,.week-topic textarea{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:9px;background:#fff}
+
+.week-date{font-size:11px;color:#475569;font-weight:700}
+.week-row{grid-template-columns:80px 42px 1fr 1fr 105px!important}
+.rph-daily-only.rph-hide{display:none!important}
+@media(max-width:650px){.week-row{grid-template-columns:68px 38px 1fr 1fr 88px!important}}
 </style>
 </head>
 <body>
@@ -269,7 +274,9 @@ function renderTabs(){const box=$('toolTabs');box.innerHTML='';Object.entries(mo
 function renderForm(){const tool=modules[currentModule].tools[currentTool];$('formTitle').textContent=tool.label;const box=$('formFields');box.innerHTML='';tool.fields.forEach(([id,label,type,opts])=>{const w=document.createElement('div');w.className='field'+(type==='textarea'?' full':'');const lab=document.createElement('label');lab.textContent=label;w.appendChild(lab);let el;if(type==='select'){el=document.createElement('select');opts.forEach(o=>{const op=document.createElement('option');op.textContent=o;el.appendChild(op)})}else if(type==='textarea'){el=document.createElement('textarea');el.rows=4;el.placeholder=opts||''}
 else if(type==='file'){el=document.createElement('input');el.type='file';el.accept=opts||'image/*'}
 else{el=document.createElement('input');el.type=(type==='date'?'date':type==='time'?'time':type==='url'?'url':'text');el.placeholder=opts||''}
-el.id='f_'+id;w.appendChild(el);
+el.id='f_'+id;
+if(currentModule==='rph'&&currentTool==='main'&&['tarikh','masa_mula','masa_tamat'].includes(id))w.classList.add('rph-daily-only');
+w.appendChild(el);
 if(type==='file'){const pv=document.createElement('div');pv.id='pv_'+id;pv.className='filepreview';pv.textContent='Belum pilih fail';w.appendChild(pv);el.addEventListener('change',()=>previewFile(id,el))}
 if(id==='tarikh')el.addEventListener('change',autoDay);
 box.appendChild(w)})
@@ -291,10 +298,23 @@ if(currentModule==='rph'){
  h.innerHTML='<b>📚 Rujukan Kurikulum:</b> Pilih Tahun + Subjek. Sistem akan masukkan pautan Buku Teks dan DSKP ke dalam prompt. AI wajib semak sumber dan tidak boleh mereka SK/SP.';
  box.appendChild(h);
  const wb=document.createElement('div');wb.id='weeklyBox';wb.className='weekly-box';wb.style.display='none';
- wb.innerHTML='<b>📅 Jadual PdP Mingguan</b><div style="font-size:11px;color:#64748b;margin:5px 0 9px">Tick hari mengajar dan isi masa sebenar.</div>'+['Isnin','Selasa','Rabu','Khamis','Jumaat'].map((x,i)=>`<div class="week-row"><b>${x}</b><input type="checkbox" id="wk_${i}_on"><input type="time" id="wk_${i}_start"><input type="time" id="wk_${i}_end"></div>`).join('')+`<div class="week-topic"><select id="weeklyTopicMode"><option>AI pecahkan topik mengikut sesi secara automatik</option><option>Saya tentukan subtopik setiap hari</option></select><textarea id="weeklySubtopicText" style="display:none;margin-top:8px" placeholder="Contoh: Rabu — Pengenalan\nKhamis — Pengukuhan\nJumaat — Latihan / Uji Minda"></textarea></div>`;
+ wb.innerHTML=`<b>📅 Jadual PdP Mingguan</b>
+ <div style="font-size:11px;color:#64748b;margin:5px 0 9px">Pilih tarikh mula minggu (Isnin), tick hari mengajar dan isi masa sebenar. Tarikh setiap sesi dikira automatik.</div>
+ <div style="margin:8px 0 12px"><label style="font-size:12px;font-weight:800">Tarikh Mula Minggu (Isnin)</label><input type="date" id="weeklyStartDate" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:9px"></div>
+ ${['Isnin','Selasa','Rabu','Khamis','Jumaat'].map((x,i)=>`<div class="week-row"><b>${x}</b><input type="checkbox" id="wk_${i}_on"><input type="time" id="wk_${i}_start"><input type="time" id="wk_${i}_end"><span class="week-date" id="wk_${i}_date">—</span></div>`).join('')}
+ <div class="week-topic"><select id="weeklyTopicMode"><option>AI pecahkan topik mengikut sesi secara automatik</option><option>Saya tentukan subtopik setiap hari</option></select><textarea id="weeklySubtopicText" style="display:none;margin-top:8px" placeholder="Contoh: Rabu — Pengenalan&#10;Khamis — Pengukuhan&#10;Jumaat — Latihan / Uji Minda"></textarea></div>`;
  box.appendChild(wb);
- const j=$('f_jenis');const tw=()=>wb.style.display=(currentTool==='main'&&j&&j.value==='RPH Mingguan')?'block':'none';if(j){j.addEventListener('change',tw);tw()}
- const tm=$('weeklyTopicMode'),tx=$('weeklySubtopicText');if(tm)tm.addEventListener('change',()=>tx.style.display=tm.value.startsWith('Saya')?'block':'none');
+ const j=$('f_jenis');
+ const daily=[...document.querySelectorAll('.rph-daily-only')];
+ const tw=()=>{
+   const weekly=(currentTool==='main'&&j&&j.value==='RPH Mingguan');
+   wb.style.display=weekly?'block':'none';
+   daily.forEach(x=>x.classList.toggle('rph-hide',weekly));
+ };
+ if(j){j.addEventListener('change',tw);tw()}
+ const tm=$('weeklyTopicMode'),tx=$('weeklySubtopicText');
+ if(tm)tm.addEventListener('change',()=>tx.style.display=tm.value.startsWith('Saya')?'block':'none');
+ const ws=$('weeklyStartDate'); if(ws)ws.addEventListener('change',updateWeeklyDates);
 }}
 function data(){const o={};modules[currentModule].tools[currentTool].fields.forEach(([id,label,type])=>{const e=$('f_'+id);o[id]=(type==='file'?(e?.files?.[0]?.name||'Belum dilampirkan'):(e?.value||''))});return o}
 function updateRphSubjects(){
@@ -310,6 +330,41 @@ function bindRphDynamic(){
  const y=$('f_tahun'); if(!y)return;
  y.addEventListener('change',updateRphSubjects);
  updateRphSubjects();
+}
+function msDate(iso){
+ if(!iso)return '';
+ const d=new Date(iso+'T00:00:00');
+ return new Intl.DateTimeFormat('ms-MY',{day:'numeric',month:'numeric',year:'numeric'}).format(d);
+}
+function addDaysISO(iso,n){
+ if(!iso)return '';
+ const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n);
+ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function updateWeeklyDates(){
+ const base=$('weeklyStartDate')?.value||'';
+ ['Isnin','Selasa','Rabu','Khamis','Jumaat'].forEach((x,i)=>{
+  const e=$(`wk_${i}_date`); if(e)e.textContent=base?msDate(addDaysISO(base,i)):'—';
+ });
+}
+function getWeeklySchedule(){
+ if(currentModule!=='rph'||currentTool!=='main'||!$('f_jenis')||$('f_jenis').value!=='RPH Mingguan')return '';
+ const base=$('weeklyStartDate')?.value||'';
+ const days=['Isnin','Selasa','Rabu','Khamis','Jumaat'],rows=[];
+ days.forEach((x,i)=>{
+   const on=$(`wk_${i}_on`);
+   if(on&&on.checked){
+     const date=base?msDate(addDaysISO(base,i)):'tarikh belum diisi';
+     const st=$(`wk_${i}_start`)?.value||'masa mula belum diisi';
+     const en=$(`wk_${i}_end`)?.value||'masa tamat belum diisi';
+     rows.push(`${x} | ${date} | ${st} - ${en}`);
+   }
+ });
+ let out=rows.length?rows.join('\\n'):'Tiada hari dipilih.';
+ const mode=$('weeklyTopicMode')?.value||'AI pecahkan topik mengikut sesi secara automatik';
+ out+=`\\nPembahagian topik: ${mode}`;
+ if(mode.startsWith('Saya')&&$('weeklySubtopicText')?.value.trim())out+=`\\nSubtopik guru:\\n${$('weeklySubtopicText').value.trim()}`;
+ return out;
 }
 function autoDay(){
  const e=$('f_tarikh'),h=$('f_hari'); if(!e||!h||!e.value)return;
@@ -333,6 +388,12 @@ if(currentModule==='opr'){
 toast('Cadangan dipilih 🎲')}
 function generatePrompt(){
 const d=data();let p='';
+if(currentModule==='rph'&&currentTool==='main'&&d.jenis==='RPH Mingguan'){
+ const any=['0','1','2','3','4'].some(i=>$(`wk_${i}_on`)?.checked);
+ if(!any){toast('Tick sekurang-kurangnya satu hari PdP');return}
+ if(!$('weeklyStartDate')?.value){toast('Pilih Tarikh Mula Minggu dahulu');return}
+}
+
 if(currentModule==='poster'){p=`Cipta poster sekolah rendah Malaysia yang kemas, menarik dan mudah dibaca.
 
 Tajuk/Program: ${d.tajuk}
@@ -426,10 +487,9 @@ MAKLUMAT GURU:
 Kelas: ${d.kelas}
 Topik/Tajuk: ${d.topik}
 Tempoh: ${d.tempoh}
-Tarikh: ${dateText}
+Tarikh: ${d.jenis==='RPH Mingguan'?'RUJUK JADUAL PdP MINGGUAN':dateText}
 Minggu: ${d.minggu||'BIARKAN BOLEH DIEDIT'}
-Masa mula: ${d.masa_mula}
-Masa tamat: ${d.masa_tamat}
+Masa: ${d.jenis==='RPH Mingguan'?'RUJUK JADUAL PdP MINGGUAN':`${d.masa_mula} - ${d.masa_tamat}`}
 Tahap murid: ${d.aras}
 Fokus/Keperluan khas: ${d.fokus}
 Nota tambahan: ${d.nota}
@@ -488,7 +548,7 @@ TINDAKAN PdP AKAN DATANG:
 ☐ PdP akan datang ditambah baik dari sudut: __________________________
 
 RPH MINGGUAN:
-Jika RPH Mingguan dipilih, WAJIB hasilkan RPH untuk SETIAP hari yang ditanda dalam Jadual PdP Mingguan — bukan satu hari sahaja.
+Jika RPH Mingguan dipilih, WAJIB hasilkan RPH untuk SETIAP hari yang ditanda dalam Jadual PdP Mingguan — bukan satu hari sahaja. Setiap sesi mesti memaparkan HARI, TARIKH sebenar yang dikira daripada Tarikh Mula Minggu, dan MASA mula/tamat masing-masing.
 Jika AI pecahkan topik dipilih, agihkan kandungan secara logik mengikut bilangan sesi berdasarkan DSKP dan buku teks.
 Jika guru menentukan subtopik, ikut pembahagian guru.
 
@@ -540,17 +600,28 @@ p=`HASILKAN ONE PAGE REPORT (OPR) SEKOLAH DALAM SATU HALAMAN SAHAJA.
 Jangan hasilkan reka bentuk seperti borang, jadual kaku atau template laporan biasa. Gunakan kreativiti visual profesional berdasarkan gambar sebenar yang dilampirkan. Kandungan wajib mesti kekal tepat tetapi susun atur visual bebas dan menarik.
 
 KANDUNGAN WAJIB
-HEADER TETAP:
+IDENTITI SEKOLAH — SECONDARY BRANDING:
 Logo rasmi SK Temin + SEKOLAH KEBANGSAAN TEMIN + CBA2050.
-Letakkan nama sekolah dan kod berhampiran logo sebagai identiti/header kecil dan kemas.
+Letakkan secara kecil/sederhana dan kemas. Ia mesti jelas wujud tetapi JANGAN terlalu besar, jangan mengambil ruang header yang tinggi dan jangan mengatasi tajuk program.
 JANGAN paparkan "KOD SEKOLAH" atau "NAMA SEKOLAH" sebagai kotak/item maklumat program.
+JANGAN jadikan garis pendek/underline di bawah CBA2050 sebagai elemen wajib.
+
+LABEL DOKUMEN:
+Paparkan "ONE PAGE REPORT (OPR)" secara kecil atau sederhana sebagai label dokumen sahaja.
+Boleh gunakan typography kreatif: contoh "ONE PAGE" sans-serif + "Report" handwriting/script/cursive.
+Label ini TIDAK BOLEH lebih menonjol daripada nama program.
+
+HERO TITLE — PALING UTAMA:
+${d.tajuk}
+Nama program/aktiviti di atas WAJIB menjadi tajuk utama paling besar, bold dan paling menonjol.
+JANGAN tulis "LAPORAN PROGRAM" sebagai tajuk utama.
+JANGAN paparkan dalam bentuk "TAJUK PROGRAM / AKTIVITI: ${d.tajuk}". Paparkan terus nama program sahaja.
 
 FOOTER TETAP:
 Paparkan hanya: "The More You Do, The More You Get"
 JANGAN tulis label "Motto SK Temin:", "Moto:" atau "Motto:".
 
 MAKLUMAT PROGRAM:
-TAJUK PROGRAM / AKTIVITI: ${d.tajuk}
 TARIKH: ${d.tarikh}
 HARI: ${d.hari}
 MASA MULA: ${d.masa_mula}
@@ -578,7 +649,11 @@ Dibenarkan: crop, resize, rotation kecil, brightness/exposure correction, contra
 DILARANG: mengubah atau mereka semula wajah, facial features, ekspresi, bentuk badan, pakaian, tangan, bilangan individu, objek, latar atau struktur adegan. Jangan tambah atau buang individu. Jangan tukar muka. Foto mesti kekal autentik walaupun layout di sekelilingnya kreatif.
 
 TIPOGRAFI & KANDUNGAN
-Gunakan Bahasa Melayu yang tepat. Jangan mereka fakta yang tidak diberikan. Jangan ubah nama, tarikh, masa, peserta atau objektif. Gunakan hierarki tajuk yang jelas dan ikon/dekorasi secara terkawal.`;
+Gunakan Bahasa Melayu yang tepat. Jangan mereka fakta yang tidak diberikan. Jangan ubah nama, tarikh, masa, peserta atau objektif.
+Hierarki visual WAJIB: NAMA PROGRAM > FOTO PROGRAM > MAKLUMAT/OBJEKTIF/RINGKASAN > IDENTITI SEKOLAH + LABEL OPR > FOOTER.
+AI bebas mencampurkan font sans-serif, serif dan handwriting/script/cursive secara terkawal untuk memberi karakter pada OPR.
+Reka bentuk tidak perlu sama setiap kali. Boleh gunakan ribbon, badge, organic shape, frame foto, typography mix dan elemen mengikut tema program.
+Kreativiti mesti kekal kemas, profesional, mudah dibaca dan SATU MUKA SURAT.`;
 if((d.logo||'').includes('SK Temin'))p+=`
 
 LOGO RASMI SK TEMIN
